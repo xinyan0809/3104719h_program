@@ -1,0 +1,40 @@
+<nav class="primary-nav" aria-label="Primary navigation">
+  <ul class="primary-nav__list">
+    {% if request.user.is_authenticated %}
+      <li>
+        <a
+          class="primary-nav__link"
+          href="{% url 'home' %}"
+          {% if request.resolver_match.url_name == "home" %}aria-current="page"{% endif %}
+        >
+          Home
+        </a>
+      </li>
+      <li>
+        <form class="logout-form" method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button class="nav-button" type="submit">Log out</button>
+        </form>
+      </li>
+    {% else %}
+      <li>
+        <a
+          class="primary-nav__link"
+          href="{% url 'login' %}"
+          {% if request.resolver_match.url_name == "login" %}aria-current="page"{% endif %}
+        >
+          Log in
+        </a>
+      </li>
+      <li>
+        <a
+          class="button button--small button--primary"
+          href="{% url 'register' %}"
+          {% if request.resolver_match.url_name == "register" %}aria-current="page"{% endif %}
+        >
+          Register
+        </a>
+      </li>
+    {% endif %}
+  </ul>
+</nav>

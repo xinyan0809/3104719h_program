@@ -1,0 +1,12 @@
+{% if messages %}
+  <div class="message-list" aria-label="Notifications">
+    {% for message in messages %}
+      <div
+        class="alert alert--{{ message.tags|default:'info' }}"
+        {% if "error" in message.tags %}role="alert"{% else %}role="status"{% endif %}
+      >
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}

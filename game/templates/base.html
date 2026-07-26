@@ -1,0 +1,26 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Pose Game{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'game/css/app.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  {% include "partials/header.html" %}
+
+  <main id="main-content" class="site-main">
+    <div class="container">
+      {% include "partials/messages.html" %}
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  {% include "partials/footer.html" %}
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,63 +1,35 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Log in</title>
-  <style>
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      font-family: Arial, sans-serif;
-      background: #f5f7fb;
-      color: #172033;
-    }
-    main {
-      width: min(92vw, 420px);
-      padding: 32px;
-      border-radius: 16px;
-      background: white;
-      box-shadow: 0 16px 40px rgba(18, 38, 63, 0.12);
-    }
-    h1 { margin: 0 0 20px; }
-    label { display: block; margin: 14px 0 6px; }
-    input {
-      box-sizing: border-box;
-      width: 100%;
-      border: 1px solid #ccd5e1;
-      border-radius: 8px;
-      padding: 10px 12px;
-    }
-    button {
-      margin-top: 20px;
-      border: 0;
-      border-radius: 8px;
-      padding: 10px 16px;
-      background: #2563eb;
-      color: white;
-      cursor: pointer;
-    }
-    .errorlist, .error {
-      color: #b42318;
-      padding-left: 18px;
-    }
-    .secondary { margin-top: 18px; }
-  </style>
-</head>
-<body>
-  <main>
-    <h1>Log in</h1>
-    {% if form.errors %}
-      <p class="error">Your username or password is incorrect.</p>
+{% extends "auth_base.html" %}
+
+{% block title %}Log in | Pose Game{% endblock %}
+
+{% block auth_heading %}Log in{% endblock %}
+
+{% block auth_intro %}
+  <p>Use your username and password to continue.</p>
+{% endblock %}
+
+{% block auth_content %}
+  {% include "partials/form_errors.html" %}
+
+  <form class="form" method="post">
+    {% csrf_token %}
+
+    {% for hidden_field in form.hidden_fields %}
+      {{ hidden_field }}
+    {% endfor %}
+
+    {% for field in form.visible_fields %}
+      {% include "partials/form_field.html" with field=field %}
+    {% endfor %}
+
+    {% if next %}
+      <input type="hidden" name="next" value="{{ next }}">
     {% endif %}
-    <form method="post">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit">Log in</button>
-    </form>
-    <p class="secondary">Don't have an account? <a href="{% url 'register' %}">Register</a></p>
-  </main>
-</body>
-</html>
+
+    <button class="button button--primary button--block" type="submit">Log in</button>
+  </form>
+
+  <p class="auth-alternative">
+    Don't have an account? <a href="{% url 'register' %}">Register</a>
+  </p>
+{% endblock %}

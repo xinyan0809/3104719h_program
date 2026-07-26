@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block body_class %}page-auth{% endblock %}
+
+{% block content %}
+  <section class="auth-layout" aria-labelledby="auth-title">
+    <div class="auth-card">
+      <header class="auth-card__header">
+        <h1 id="auth-title">{% block auth_heading %}{% endblock %}</h1>
+        {% block auth_intro %}{% endblock %}
+      </header>
+
+      {% block auth_content %}{% endblock %}
+    </div>
+  </section>
+{% endblock %}
