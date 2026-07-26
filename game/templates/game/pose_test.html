@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Pose Test | Pose Game{% endblock %}
 
@@ -10,5 +11,10 @@
       detection. Camera controls and pose processing will be added in later
       increments.
     </p>
+    <p id="frontend-status" data-module-status="loading">Loading frontend module...</p>
   </section>
+{% endblock %}
+
+{% block extra_js %}
+  <script type="module" src="{% static 'game/vite/pose-test.js' %}"></script>
 {% endblock %}
