@@ -10,6 +10,11 @@ def home(request):
     return render(request, "game/home.html")
 
 
+@login_required
+def pose_test(request):
+    return render(request, "game/pose_test.html")
+
+
 def register(request):
     if request.user.is_authenticated:
         return redirect("home")

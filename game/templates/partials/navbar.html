@@ -11,6 +11,15 @@
         </a>
       </li>
       <li>
+        <a
+          class="primary-nav__link"
+          href="{% url 'pose_test' %}"
+          {% if request.resolver_match.url_name == "pose_test" %}aria-current="page"{% endif %}
+        >
+          Pose Test
+        </a>
+      </li>
+      <li>
         <form class="logout-form" method="post" action="{% url 'logout' %}">
           {% csrf_token %}
           <button class="nav-button" type="submit">Log out</button>
