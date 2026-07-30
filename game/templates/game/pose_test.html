@@ -4,14 +4,48 @@
 {% block title %}Pose Test | Pose Game{% endblock %}
 
 {% block content %}
-  <section id="pose-test-root" class="content-card" aria-labelledby="page-title">
+  <section
+    id="pose-test-root"
+    class="content-card content-card--wide pose-test"
+    aria-labelledby="page-title"
+  >
     <h1 id="page-title">Pose Test</h1>
     <p>
-      This protected development page will be used to verify browser-based pose
-      detection. Camera controls and pose processing will be added in later
-      increments.
+      This protected development page verifies browser-based pose detection. It
+      is a technical prototype, not the finished game.
     </p>
-    <p id="frontend-status" data-module-status="loading">Loading frontend module...</p>
+
+    <div class="pose-controls" aria-label="Camera controls">
+      <button id="start-camera" class="button button--primary" type="button">
+        Start Camera
+      </button>
+      <button
+        id="stop-camera"
+        class="button button--secondary"
+        type="button"
+        disabled
+      >
+        Stop Camera
+      </button>
+    </div>
+
+    <div class="pose-status-panel" aria-live="polite">
+      <p>
+        Status:
+        <strong id="pose-status" data-status="idle">Camera not started</strong>
+      </p>
+      <p id="camera-error" class="pose-error" role="alert" hidden></p>
+    </div>
+
+    <div class="pose-stage" aria-label="Live camera preview">
+      <video id="camera-preview" autoplay muted playsinline></video>
+      <canvas id="pose-overlay" aria-hidden="true"></canvas>
+    </div>
+
+    <p class="pose-privacy">
+      Video frames stay in this browser. This prototype does not record or send
+      camera images to Django.
+    </p>
   </section>
 {% endblock %}
 
