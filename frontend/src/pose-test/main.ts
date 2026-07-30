@@ -2,12 +2,23 @@ import "vite/modulepreload-polyfill";
 
 import { CameraController } from "./camera";
 import { getPoseTestElements } from "./dom";
+import {
+  closePoseLandmarker,
+  loadPoseLandmarker,
+} from "./pose-landmarker";
+import { PoseDetectionLoop } from "./pose-loop";
+import { PoseRenderer } from "./pose-renderer";
+import type { PoseLandmarker } from "@mediapipe/tasks-vision";
 
 const elements = getPoseTestElements();
 
 if (elements) {
   const camera = new CameraController();
+  const renderer = new PoseRenderer(elements.canvas);
+  let landmarker: PoseLandmarker | null = null;
+  let detectionLoop: PoseDetectionLoop | null = null;
   let isStarting = false;
+  let operationVersion = 0;
 
   const setStatus = (message: string, state: string): void => {
     elements.status.textContent = message;
@@ -30,8 +41,17 @@ if (elements) {
     elements.stopButton.disabled = !camera.isRunning;
   };
 
-  const stopCamera = (): void => {
+  const releaseCameraAndLoop = (): void => {
+    detectionLoop?.stop();
+    detectionLoop = null;
     camera.stop(elements.video);
+    renderer.clear();
+  };
+
+  const stopPrototype = (): void => {
+    operationVersion += 1;
+    isStarting = false;
+    releaseCameraAndLoop();
     clearError();
     setStatus("Camera not started", "idle");
     updateControls();
@@ -42,24 +62,63 @@ if (elements) {
       return;
     }
 
+    const currentOperation = ++operationVersion;
     isStarting = true;
     clearError();
-    setStatus("Starting camera", "loading");
+    setStatus("Loading pose model", "loading");
     updateControls();
 
     try {
       await camera.start(elements.video);
-      setStatus("Camera started", "ready");
+      if (currentOperation !== operationVersion || !camera.isRunning) {
+        return;
+      }
+      updateControls();
+
+      landmarker = await loadPoseLandmarker();
+      if (currentOperation !== operationVersion || !camera.isRunning) {
+        return;
+      }
+
+      detectionLoop = new PoseDetectionLoop(
+        elements.video,
+        landmarker,
+        (result) => {
+          const poseDetected = renderer.draw(result, elements.video);
+          setStatus(
+            poseDetected ? "Pose detected" : "No pose detected",
+            poseDetected ? "detected" : "ready",
+          );
+        },
+        (error) => {
+          releaseCameraAndLoop();
+          showError(error);
+          setStatus("Camera or model error", "error");
+          updateControls();
+        },
+      );
+      detectionLoop.start();
+      setStatus("No pose detected", "ready");
     } catch (error) {
-      showError(error);
-      setStatus("Camera or model error", "error");
+      if (currentOperation === operationVersion) {
+        releaseCameraAndLoop();
+        showError(error);
+        setStatus("Camera or model error", "error");
+      }
     } finally {
-      isStarting = false;
+      if (currentOperation === operationVersion) {
+        isStarting = false;
+      }
       updateControls();
     }
   });
 
-  elements.stopButton.addEventListener("click", stopCamera);
-  window.addEventListener("pagehide", () => camera.stop(elements.video));
+  elements.stopButton.addEventListener("click", stopPrototype);
+  window.addEventListener("pagehide", () => {
+    operationVersion += 1;
+    releaseCameraAndLoop();
+    closePoseLandmarker(landmarker);
+    landmarker = null;
+  });
   updateControls();
 }

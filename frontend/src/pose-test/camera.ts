@@ -7,6 +7,7 @@ export class CameraAccessError extends Error {
 
 export class CameraController {
   private stream: MediaStream | null = null;
+  private requestVersion = 0;
 
   get isRunning(): boolean {
     return this.stream !== null;
@@ -23,6 +24,8 @@ export class CameraController {
       );
     }
 
+    const requestVersion = ++this.requestVersion;
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: false,
@@ -32,6 +35,11 @@ export class CameraController {
           height: { ideal: 720 },
         },
       });
+
+      if (requestVersion !== this.requestVersion) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
 
       this.stream = stream;
       video.srcObject = stream;
@@ -43,6 +51,7 @@ export class CameraController {
   }
 
   stop(video: HTMLVideoElement): void {
+    this.requestVersion += 1;
     this.stream?.getTracks().forEach((track) => track.stop());
     this.stream = null;
     video.pause();
