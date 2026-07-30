@@ -2,6 +2,7 @@ import "vite/modulepreload-polyfill";
 
 import { CameraController } from "./camera";
 import { getPoseTestElements } from "./dom";
+import { HorizontalMovementTracker } from "./movement";
 import {
   closePoseLandmarker,
   loadPoseLandmarker,
@@ -15,6 +16,7 @@ const elements = getPoseTestElements();
 if (elements) {
   const camera = new CameraController();
   const renderer = new PoseRenderer(elements.canvas);
+  const movementTracker = new HorizontalMovementTracker();
   let landmarker: PoseLandmarker | null = null;
   let detectionLoop: PoseDetectionLoop | null = null;
   let isStarting = false;
@@ -23,6 +25,11 @@ if (elements) {
   const setStatus = (message: string, state: string): void => {
     elements.status.textContent = message;
     elements.status.dataset.status = state;
+  };
+
+  const setMovement = (state: string | null): void => {
+    elements.movement.textContent = state ?? "—";
+    elements.movement.dataset.movement = state?.toLowerCase() ?? "unknown";
   };
 
   const clearError = (): void => {
@@ -46,6 +53,8 @@ if (elements) {
     detectionLoop = null;
     camera.stop(elements.video);
     renderer.clear();
+    movementTracker.reset();
+    setMovement(null);
   };
 
   const stopPrototype = (): void => {
@@ -85,6 +94,11 @@ if (elements) {
         landmarker,
         (result) => {
           const poseDetected = renderer.draw(result, elements.video);
+          const movementState = movementTracker.update(
+            result.landmarks[0],
+            performance.now(),
+          );
+          setMovement(movementState);
           setStatus(
             poseDetected ? "Pose detected" : "No pose detected",
             poseDetected ? "detected" : "ready",
@@ -98,6 +112,7 @@ if (elements) {
         },
       );
       detectionLoop.start();
+      setMovement(null);
       setStatus("No pose detected", "ready");
     } catch (error) {
       if (currentOperation === operationVersion) {

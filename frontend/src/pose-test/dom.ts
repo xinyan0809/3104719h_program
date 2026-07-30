@@ -5,6 +5,7 @@ export interface PoseTestElements {
   video: HTMLVideoElement;
   canvas: HTMLCanvasElement;
   status: HTMLElement;
+  movement: HTMLElement;
   error: HTMLElement;
 }
 
@@ -21,6 +22,7 @@ export function getPoseTestElements(): PoseTestElements | null {
     video: requireElement<HTMLVideoElement>("#camera-preview"),
     canvas: requireElement<HTMLCanvasElement>("#pose-overlay"),
     status: requireElement<HTMLElement>("#pose-status"),
+    movement: requireElement<HTMLElement>("#movement-state"),
     error: requireElement<HTMLElement>("#camera-error"),
   };
 }
