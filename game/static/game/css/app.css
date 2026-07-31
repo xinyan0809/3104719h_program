@@ -206,6 +206,10 @@ input {
   padding: var(--space-6);
 }
 
+.content-card--wide {
+  max-width: 64rem;
+}
+
 .auth-card__header {
   margin-bottom: var(--space-5);
 }
@@ -310,6 +314,89 @@ input {
 .alert__list {
   margin: var(--space-2) 0 0;
   padding-left: var(--space-5);
+}
+
+.pose-controls {
+  margin-top: var(--space-5);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.button--secondary {
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+.button--secondary:hover {
+  background: var(--color-background);
+}
+
+.button:disabled,
+.nav-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.pose-status-panel {
+  min-height: 5.5rem;
+  margin-top: var(--space-5);
+}
+
+.pose-status-panel p {
+  margin: 0;
+}
+
+.pose-status-panel p + p {
+  margin-top: var(--space-2);
+}
+
+#movement-state[data-movement="left"],
+#movement-state[data-movement="right"] {
+  color: var(--color-info);
+}
+
+#movement-state[data-movement="centre"] {
+  color: var(--color-success);
+}
+
+.pose-error {
+  margin-top: var(--space-2) !important;
+  color: var(--color-error) !important;
+  font-weight: 650;
+}
+
+.pose-error[hidden] {
+  display: none;
+}
+
+.pose-stage {
+  position: relative;
+  width: 100%;
+  margin-top: var(--space-4);
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-small);
+  background: #101828;
+}
+
+.pose-stage video,
+.pose-stage canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+}
+
+.pose-stage canvas {
+  pointer-events: none;
+}
+
+.pose-privacy {
+  font-size: 0.875rem;
 }
 
 .site-footer {
