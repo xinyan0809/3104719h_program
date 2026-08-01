@@ -4,7 +4,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Pose Game{% endblock %}</title>
+  <meta
+    name="description"
+    content="A Django and MediaPipe research prototype for browser-based pose-controlled interaction."
+  >
+  <meta name="theme-color" content="#f3f6fa">
+  <title>{% block title %}Pose Platform{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'game/css/app.css' %}">
   {% block extra_css %}{% endblock %}
 </head>
@@ -14,7 +19,7 @@
   {% include "partials/header.html" %}
 
   <main id="main-content" class="site-main">
-    <div class="container">
+    <div class="container site-main__inner">
       {% include "partials/messages.html" %}
       {% block content %}{% endblock %}
     </div>
