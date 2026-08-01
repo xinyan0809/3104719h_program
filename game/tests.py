@@ -31,3 +31,13 @@ class PoseTestAccessTests(TestCase):
         response = self.client.get(reverse("pose_test"))
 
         self.assertTemplateUsed(response, "game/pose_test.html")
+
+
+class CookieNoticeTemplateTests(TestCase):
+    def test_login_page_includes_shared_cookie_notice(self):
+        response = self.client.get(reverse("login"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "partials/cookie_notice.html")
+        self.assertContains(response, 'id="cookie-notice"')
+        self.assertContains(response, "game/vite/cookie-notice.js")

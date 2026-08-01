@@ -26,6 +26,8 @@
   </main>
 
   {% include "partials/footer.html" %}
+  {% include "partials/cookie_notice.html" %}
+  <script type="module" src="{% static 'game/vite/cookie-notice.js' %}"></script>
   {% block extra_js %}{% endblock %}
 </body>
 </html>

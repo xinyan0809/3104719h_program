@@ -874,6 +874,69 @@ canvas {
   text-align: right;
 }
 
+.cookie-notice {
+  position: fixed;
+  z-index: 80;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: var(--space-4);
+  pointer-events: none;
+}
+
+.cookie-notice[hidden] {
+  display: none;
+}
+
+.cookie-notice__inner {
+  width: min(100%, 68rem);
+  margin-inline: auto;
+  border: 1px solid #354256;
+  border-radius: var(--radius-large);
+  padding: var(--space-5);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-5);
+  color: #d7deea;
+  background: rgba(17, 24, 39, 0.97);
+  box-shadow: var(--shadow-elevated);
+  backdrop-filter: blur(16px);
+  pointer-events: auto;
+}
+
+.cookie-notice__copy {
+  max-width: 52rem;
+}
+
+.cookie-notice__label {
+  margin-bottom: var(--space-2);
+  display: block;
+  color: #9db6ff;
+  font-size: var(--font-size-xs);
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.cookie-notice h2 {
+  margin-bottom: var(--space-2);
+  color: #ffffff;
+  font-size: var(--font-size-lg);
+  letter-spacing: -0.01em;
+}
+
+.cookie-notice p {
+  margin-bottom: 0;
+  color: #bcc7d6;
+  font-size: var(--font-size-sm);
+}
+
+.cookie-notice__action {
+  min-width: 7.5rem;
+}
+
 @media (max-width: 56rem) {
   .site-header__inner {
     padding-block: var(--space-3);
@@ -930,6 +993,19 @@ canvas {
 
   .site-footer__meta {
     text-align: left;
+  }
+
+  .cookie-notice {
+    padding: var(--space-3);
+  }
+
+  .cookie-notice__inner {
+    grid-template-columns: 1fr;
+    padding: var(--space-4);
+  }
+
+  .cookie-notice__action {
+    width: 100%;
   }
 
   .auth-card,

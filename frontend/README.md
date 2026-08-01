@@ -1,8 +1,8 @@
 # Vite and TypeScript assets
 
 Django remains responsible for HTML rendering, URLs, authentication, and access
-control. Vite only compiles the TypeScript module loaded by the protected
-`/pose-test/` Django page.
+control. Vite compiles two small browser modules: the site-wide cookie notice
+and the pose module loaded by the protected `/pose-test/` Django page.
 
 The generated files are written to `game/static/game/vite/` so Django
 staticfiles can serve them. This output directory is generated and is not
@@ -20,6 +20,10 @@ runtime, the pose prototype loads:
 The fetched files contain runtime code and the pose model only. Webcam frames,
 landmarks, raw body coordinates, and horizontal movement calculations remain in
 browser memory. They are not recorded, sent to Django, or saved to the database.
+
+The cookie notice explains Django's essential session and CSRF cookies. Its
+acknowledgement flag is stored in browser `localStorage`; it is not submitted to
+Django and no optional analytics or advertising cookies are introduced.
 
 ## Development
 
@@ -43,8 +47,8 @@ Run Django in a second terminal from the repository root:
 .\.venv\Scripts\python.exe manage.py runserver
 ```
 
-Vite rebuilds the module when its source changes. Refresh `/pose-test/` in the
-browser after a rebuild.
+Vite rebuilds both modules when their source changes. Refresh the relevant page
+in the browser after a rebuild.
 
 Camera access is available on secure origins and on `localhost`. Open the
 Django development server through `http://127.0.0.1:8000/`, sign in, and visit
