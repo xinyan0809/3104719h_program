@@ -1,4 +1,5 @@
-const STORAGE_KEY = "pose-platform.cookie-notice.v2";
+const STORAGE_KEY = "poseplay.cookie-notice.v2";
+const LEGACY_STORAGE_KEY = "pose-platform.cookie-notice.v2";
 
 const notice = document.querySelector<HTMLElement>("#cookie-notice");
 const acceptButton = document.querySelector<HTMLButtonElement>("#accept-cookies");
@@ -9,7 +10,15 @@ if (notice && acceptButton && declineButton) {
   let savedChoice: string | null = null;
 
   try {
-    savedChoice = window.localStorage.getItem(STORAGE_KEY);
+    savedChoice =
+      window.localStorage.getItem(STORAGE_KEY) ??
+      window.localStorage.getItem(LEGACY_STORAGE_KEY);
+
+    if (savedChoice === "accepted" || savedChoice === "declined") {
+      window.localStorage.setItem(STORAGE_KEY, savedChoice);
+    }
+
+    window.localStorage.removeItem(LEGACY_STORAGE_KEY);
   } catch {
     // The choices can still dismiss the notice if storage is unavailable.
   }

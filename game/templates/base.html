@@ -6,17 +6,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta
     name="description"
-    content="A Django and MediaPipe research prototype for browser-based pose-controlled interaction."
+    content="PosePlay is a Django and MediaPipe prototype for browser-based pose-controlled games."
   >
   <meta name="theme-color" content="#f3f6fa">
-  <title>{% block title %}Pose Platform{% endblock %}</title>
-  <link rel="stylesheet" href="{% static 'game/css/app.css' %}">
+  <title>{% block title %}PosePlay{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'game/css/app.css' %}?v=20260802-1">
   {% block extra_css %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}">
   <a class="skip-link" href="#main-content">Skip to main content</a>
 
-  {% include "partials/header.html" %}
+  {% if request.user.is_authenticated %}
+    {% include "partials/header.html" %}
+  {% endif %}
 
   <main id="main-content" class="site-main">
     <div class="container site-main__inner">

@@ -1,8 +1,23 @@
+from django.conf import settings
 from django.contrib.auth import login
+from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
-from .forms import RegistrationForm
+from .forms import RegistrationForm, RememberMeAuthenticationForm
+
+
+class RememberMeLoginView(auth_views.LoginView):
+    template_name = "registration/login.html"
+    authentication_form = RememberMeAuthenticationForm
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if form.cleaned_data["remember_me"]:
+            self.request.session.set_expiry(settings.SESSION_COOKIE_AGE)
+        else:
+            self.request.session.set_expiry(0)
+        return response
 
 
 @login_required
