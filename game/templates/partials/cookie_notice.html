@@ -6,20 +6,44 @@
 >
   <div class="cookie-notice__inner">
     <div class="cookie-notice__copy">
-      <span class="cookie-notice__label">Essential cookies</span>
-      <h2 id="cookie-notice-title">This prototype uses essential cookies</h2>
-      <p>
-        Django uses cookies to maintain your sign-in session and protect forms.
-        No advertising or pose-tracking cookies are used, and webcam or pose
-        data remains in this browser.
-      </p>
+      <div class="cookie-notice__summary">
+        <span class="cookie-notice__label">Cookie settings</span>
+        <h2 id="cookie-notice-title">We use cookies</h2>
+        <p class="cookie-notice__intro">
+          Pose Platform uses cookies to provide a secure and consistent
+          experience. Here is what we store:
+        </p>
+      </div>
+      <ul class="cookie-notice__list">
+        <li>
+          <strong>Essential</strong> &mdash; required for the site to function
+          securely
+        </li>
+        <li>
+          <strong>Authentication</strong> &mdash; keeps you signed in during
+          your session
+        </li>
+        <li>
+          <strong>Preferences</strong> &mdash; remembers your cookie choice in
+          this browser
+        </li>
+      </ul>
     </div>
-    <button
-      id="acknowledge-cookies"
-      class="button button--primary cookie-notice__action"
-      type="button"
-    >
-      Understood
-    </button>
+    <div class="cookie-notice__actions" aria-label="Cookie choices">
+      <button
+        id="accept-cookies"
+        class="button button--primary cookie-notice__action"
+        type="button"
+      >
+        Accept all cookies
+      </button>
+      <button
+        id="decline-cookies"
+        class="button button--cookie-decline cookie-notice__action"
+        type="button"
+      >
+        Decline
+      </button>
+    </div>
   </div>
 </aside>

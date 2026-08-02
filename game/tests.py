@@ -40,4 +40,6 @@ class CookieNoticeTemplateTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "partials/cookie_notice.html")
         self.assertContains(response, 'id="cookie-notice"')
+        self.assertContains(response, "Accept all cookies")
+        self.assertContains(response, "Decline")
         self.assertContains(response, "game/vite/cookie-notice.js")

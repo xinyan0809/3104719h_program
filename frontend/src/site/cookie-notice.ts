@@ -1,30 +1,33 @@
-const STORAGE_KEY = "pose-platform.cookie-notice.v1";
+const STORAGE_KEY = "pose-platform.cookie-notice.v2";
 
 const notice = document.querySelector<HTMLElement>("#cookie-notice");
-const acknowledgeButton = document.querySelector<HTMLButtonElement>(
-  "#acknowledge-cookies",
-);
+const acceptButton = document.querySelector<HTMLButtonElement>("#accept-cookies");
+const declineButton =
+  document.querySelector<HTMLButtonElement>("#decline-cookies");
 
-if (notice && acknowledgeButton) {
-  let isAcknowledged = false;
+if (notice && acceptButton && declineButton) {
+  let savedChoice: string | null = null;
 
   try {
-    isAcknowledged = window.localStorage.getItem(STORAGE_KEY) === "acknowledged";
+    savedChoice = window.localStorage.getItem(STORAGE_KEY);
   } catch {
-    // The notice can still be dismissed for this page if storage is unavailable.
+    // The choices can still dismiss the notice if storage is unavailable.
   }
 
-  if (!isAcknowledged) {
+  if (savedChoice !== "accepted" && savedChoice !== "declined") {
     notice.hidden = false;
   }
 
-  acknowledgeButton.addEventListener("click", () => {
+  const saveChoice = (choice: "accepted" | "declined") => {
     try {
-      window.localStorage.setItem(STORAGE_KEY, "acknowledged");
+      window.localStorage.setItem(STORAGE_KEY, choice);
     } catch {
       // Storage can be blocked by browser privacy settings; dismissal still works.
     }
 
     notice.hidden = true;
-  });
+  };
+
+  acceptButton.addEventListener("click", () => saveChoice("accepted"));
+  declineButton.addEventListener("click", () => saveChoice("declined"));
 }

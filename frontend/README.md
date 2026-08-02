@@ -21,9 +21,10 @@ The fetched files contain runtime code and the pose model only. Webcam frames,
 landmarks, raw body coordinates, and horizontal movement calculations remain in
 browser memory. They are not recorded, sent to Django, or saved to the database.
 
-The cookie notice explains Django's essential session and CSRF cookies. Its
-acknowledgement flag is stored in browser `localStorage`; it is not submitted to
-Django and no optional analytics or advertising cookies are introduced.
+The cookie notice explains Django's essential session and CSRF cookies. The
+user's accepted or declined choice is stored in browser `localStorage`; it is
+not submitted to Django and no optional analytics or advertising cookies are
+introduced.
 
 ## Development
 
