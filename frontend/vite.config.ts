@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import { fileURLToPath } from "node:url";
 
 const poseTestEntry = new URL("./src/pose-test/main.ts", import.meta.url);
+const fruitCatchEntry = new URL("./src/fruit-catch/main.ts", import.meta.url);
 const cookieNoticeEntry = new URL(
   "./src/site/cookie-notice.ts",
   import.meta.url,
@@ -20,6 +21,7 @@ export default defineConfig({
     rolldownOptions: {
       input: {
         "cookie-notice": fileURLToPath(cookieNoticeEntry),
+        "fruit-catch": fileURLToPath(fruitCatchEntry),
         "pose-test": fileURLToPath(poseTestEntry),
       },
       output: {

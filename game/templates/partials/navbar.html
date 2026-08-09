@@ -19,6 +19,15 @@
           Pose Test
         </a>
       </li>
+      <li>
+        <a
+          class="primary-nav__link"
+          href="{% url 'fruit_catch' %}"
+          {% if request.resolver_match.url_name == "fruit_catch" %}aria-current="page"{% endif %}
+        >
+          Fruit Catch
+        </a>
+      </li>
       <li class="primary-nav__identity">
         <span class="user-chip" aria-label="Signed in as {{ request.user.username }}">
           <span class="user-chip__label">Signed in</span>
