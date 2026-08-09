@@ -7,6 +7,7 @@ import {
 } from "../pose-test/pose-landmarker";
 import { PoseDetectionLoop } from "../pose-test/pose-loop";
 import { PoseRenderer } from "../pose-test/pose-renderer";
+import { EasyFruitCatchGame, type GameState } from "./game";
 import { WristBasketController } from "./wrist-baskets";
 
 interface FruitCatchElements {
@@ -15,6 +16,7 @@ interface FruitCatchElements {
   startCameraButton: HTMLButtonElement;
   stopCameraButton: HTMLButtonElement;
   startGameButton: HTMLButtonElement;
+  restartGameButton: HTMLButtonElement;
   video: HTMLVideoElement;
   canvas: HTMLCanvasElement;
   poseStatus: HTMLElement;
@@ -22,6 +24,12 @@ interface FruitCatchElements {
   error: HTMLElement;
   leftBasket: HTMLElement;
   rightBasket: HTMLElement;
+  fruitLayer: HTMLElement;
+  score: HTMLElement;
+  time: HTMLElement;
+  countdown: HTMLElement;
+  finishedPanel: HTMLElement;
+  finalScore: HTMLElement;
 }
 
 export function mountFruitCatch(): void {
@@ -43,6 +51,9 @@ export function mountFruitCatch(): void {
   let isStarting = false;
   let modelReady = false;
   let operationVersion = 0;
+  let game: EasyFruitCatchGame;
+
+  const isGameReady = (): boolean => modelReady && camera.isRunning;
 
   const setPoseStatus = (message: string, state: string): void => {
     elements.poseStatus.textContent = message;
@@ -60,13 +71,31 @@ export function mountFruitCatch(): void {
     elements.error.hidden = false;
   };
 
-  const updateControls = (): void => {
+  const updateControls = (_state?: GameState): void => {
+    const state = game?.state ?? "IDLE";
+    const ready = isGameReady();
     elements.startCameraButton.disabled = isStarting || camera.isRunning;
     elements.stopCameraButton.disabled = !camera.isRunning;
-    // Gameplay is enabled in the next isolated increment.
-    elements.startGameButton.disabled = true;
-    elements.root.dataset.modelReady = String(modelReady && camera.isRunning);
+    elements.startGameButton.disabled = !ready || state !== "IDLE";
+    elements.restartGameButton.disabled = !ready || state !== "FINISHED";
+    elements.root.dataset.modelReady = String(ready);
   };
+
+  game = new EasyFruitCatchGame(
+    {
+      stage: elements.stage,
+      fruitLayer: elements.fruitLayer,
+      score: elements.score,
+      time: elements.time,
+      countdown: elements.countdown,
+      status: elements.gameStatus,
+      finishedPanel: elements.finishedPanel,
+      finalScore: elements.finalScore,
+    },
+    baskets,
+    isGameReady,
+    updateControls,
+  );
 
   const releaseCameraAndPose = (): void => {
     detectionLoop?.stop();
@@ -75,6 +104,7 @@ export function mountFruitCatch(): void {
     renderer.clear();
     baskets.reset();
     modelReady = false;
+    game.cancel();
   };
 
   const stopCamera = (): void => {
@@ -83,8 +113,17 @@ export function mountFruitCatch(): void {
     releaseCameraAndPose();
     clearError();
     setPoseStatus("Camera not started", "idle");
-    elements.gameStatus.textContent = "Idle";
-    elements.gameStatus.dataset.state = "idle";
+    updateControls();
+  };
+
+  const beginGame = (): void => {
+    clearError();
+    if (!isGameReady()) {
+      showError(new Error("Start the camera and wait for the pose model before playing."));
+      updateControls();
+      return;
+    }
+    game.start();
     updateControls();
   };
 
@@ -134,7 +173,8 @@ export function mountFruitCatch(): void {
       );
       detectionLoop.start();
       setPoseStatus("No pose detected", "ready");
-      elements.gameStatus.textContent = "Camera and model ready";
+      elements.gameStatus.textContent = "Ready to start";
+      updateControls();
     } catch (error) {
       if (currentOperation === operationVersion) {
         releaseCameraAndPose();
@@ -150,6 +190,8 @@ export function mountFruitCatch(): void {
   });
 
   elements.stopCameraButton.addEventListener("click", stopCamera);
+  elements.startGameButton.addEventListener("click", beginGame);
+  elements.restartGameButton.addEventListener("click", beginGame);
   window.addEventListener("pagehide", () => {
     operationVersion += 1;
     releaseCameraAndPose();
@@ -182,6 +224,7 @@ function getElements(): FruitCatchElements | null {
     startCameraButton: requireFromRoot<HTMLButtonElement>("#start-camera"),
     stopCameraButton: requireFromRoot<HTMLButtonElement>("#stop-camera"),
     startGameButton: requireFromRoot<HTMLButtonElement>("#start-game"),
+    restartGameButton: requireFromRoot<HTMLButtonElement>("#restart-game"),
     video: requireFromRoot<HTMLVideoElement>("#camera-preview"),
     canvas: requireFromRoot<HTMLCanvasElement>("#pose-overlay"),
     poseStatus: requireFromRoot<HTMLElement>("#pose-status"),
@@ -189,5 +232,11 @@ function getElements(): FruitCatchElements | null {
     error: requireFromRoot<HTMLElement>("#game-error"),
     leftBasket: requireFromRoot<HTMLElement>("#left-basket"),
     rightBasket: requireFromRoot<HTMLElement>("#right-basket"),
+    fruitLayer: requireFromRoot<HTMLElement>("#fruit-layer"),
+    score: requireFromRoot<HTMLElement>("#game-score"),
+    time: requireFromRoot<HTMLElement>("#game-time"),
+    countdown: requireFromRoot<HTMLElement>("#game-countdown"),
+    finishedPanel: requireFromRoot<HTMLElement>("#game-finished"),
+    finalScore: requireFromRoot<HTMLElement>("#final-score"),
   };
 }
