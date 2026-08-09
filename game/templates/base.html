@@ -4,23 +4,32 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Pose Game{% endblock %}</title>
-  <link rel="stylesheet" href="{% static 'game/css/app.css' %}">
+  <meta
+    name="description"
+    content="PosePlay is a Django and MediaPipe prototype for browser-based pose-controlled games."
+  >
+  <meta name="theme-color" content="#f3f6fa">
+  <title>{% block title %}PosePlay{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'game/css/app.css' %}?v=20260802-1">
   {% block extra_css %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}">
   <a class="skip-link" href="#main-content">Skip to main content</a>
 
-  {% include "partials/header.html" %}
+  {% if request.user.is_authenticated %}
+    {% include "partials/header.html" %}
+  {% endif %}
 
   <main id="main-content" class="site-main">
-    <div class="container">
+    <div class="container site-main__inner">
       {% include "partials/messages.html" %}
       {% block content %}{% endblock %}
     </div>
   </main>
 
   {% include "partials/footer.html" %}
+  {% include "partials/cookie_notice.html" %}
+  <script type="module" src="{% static 'game/vite/cookie-notice.js' %}"></script>
   {% block extra_js %}{% endblock %}
 </body>
 </html>

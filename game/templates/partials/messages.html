@@ -5,7 +5,8 @@
         class="alert alert--{{ message.tags|default:'info' }}"
         {% if "error" in message.tags %}role="alert"{% else %}role="status"{% endif %}
       >
-        {{ message }}
+        <span class="alert__indicator" aria-hidden="true"></span>
+        <div class="alert__content">{{ message }}</div>
       </div>
     {% endfor %}
   </div>

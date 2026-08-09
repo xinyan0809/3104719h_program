@@ -1,6 +1,16 @@
 <header class="site-header">
   <div class="container site-header__inner">
-    <a class="site-brand" href="{% url 'home' %}">Pose Game</a>
+    <a
+      class="site-brand"
+      href="{% if request.user.is_authenticated %}{% url 'home' %}{% else %}{% url 'login' %}{% endif %}"
+      aria-label="PosePlay{% if request.user.is_authenticated %} home{% else %} login{% endif %}"
+    >
+      <span class="site-brand__mark" aria-hidden="true">PP</span>
+      <span class="site-brand__copy">
+        <span class="site-brand__name">PosePlay</span>
+        <span class="site-brand__descriptor">Move your body. Control the game.</span>
+      </span>
+    </a>
     {% include "partials/navbar.html" %}
   </div>
 </header>
