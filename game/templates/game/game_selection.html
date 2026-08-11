@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Play Game | PosePlay{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'game/css/game-library.css' %}">
+{% endblock %}
+
+{% block content %}
+  <section class="game-library" aria-labelledby="page-title">
+    <header class="page-heading">
+      <p class="eyebrow">Game library</p>
+      <h1 id="page-title" class="page-heading__title">Choose a game</h1>
+      <p class="page-heading__summary">
+        Select a game first. Camera access is only requested after you enter the
+        game and choose to start it.
+      </p>
+    </header>
+
+    <div class="game-library__grid">
+      <a class="game-tile" href="{% url 'fruit_catch' %}">
+        <span class="game-tile__preview" aria-hidden="true">
+          <span>🍎</span>
+          <span>🍊</span>
+          <span>🍓</span>
+          <span class="game-tile__basket">▰</span>
+        </span>
+        <span class="game-tile__body">
+          <span class="badge badge--success">Easy</span>
+          <span class="game-tile__title">Fruit Catch</span>
+          <span class="game-tile__description">
+            Move two baskets with your wrists and catch falling fruit.
+          </span>
+          <span class="game-tile__action">Play game <span aria-hidden="true">→</span></span>
+        </span>
+      </a>
+    </div>
+  </section>
+{% endblock %}
