@@ -1,10 +1,13 @@
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
 from .forms import RegistrationForm, RememberMeAuthenticationForm
+from .models import UserProfile
+from .profile_forms import ProfileUpdateForm
 
 
 class RememberMeLoginView(auth_views.LoginView):
@@ -42,7 +45,27 @@ def game_selection(request):
 
 @login_required
 def user_profile(request):
-    return render(request, "game/user_profile.html")
+    profile = UserProfile.objects.filter(user=request.user).first()
+    is_editing = request.method == "POST" or request.GET.get("edit") == "1"
+
+    if request.method == "POST":
+        form = ProfileUpdateForm(
+            request.POST,
+            request.FILES,
+            user=request.user,
+        )
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your profile has been updated.")
+            return redirect("user_profile")
+    else:
+        form = ProfileUpdateForm(user=request.user)
+
+    return render(
+        request,
+        "game/user_profile.html",
+        {"form": form, "profile": profile, "is_editing": is_editing},
+    )
 
 
 def register(request):

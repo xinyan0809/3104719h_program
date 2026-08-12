@@ -72,6 +72,7 @@
 }
 
 html {
+  scrollbar-gutter: stable;
   color-scheme: light;
   background: var(--color-background);
 }

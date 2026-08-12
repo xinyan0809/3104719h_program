@@ -28,17 +28,29 @@
           User Profile
         </a>
       </li>
-      <li class="primary-nav__identity">
-        <span class="user-chip" aria-label="Signed in as {{ request.user.username }}">
-          <span class="user-chip__label">Signed in</span>
-          <strong>{{ request.user.username }}</strong>
-        </span>
-      </li>
-      <li>
-        <form class="logout-form" method="post" action="{% url 'logout' %}">
-          {% csrf_token %}
-          <button class="nav-button" type="submit">Log out</button>
-        </form>
+      <li class="account-menu-item">
+        <details class="account-menu">
+          <summary
+            class="account-menu__trigger"
+            aria-label="Open account menu for {{ request.user.username }}"
+          >
+            {% if request.user.user_profile.avatar %}
+              <img
+                src="{{ request.user.user_profile.avatar.url }}"
+                alt=""
+                class="account-menu__avatar"
+              >
+            {% else %}
+              <span class="account-menu__fallback" aria-hidden="true">👤</span>
+            {% endif %}
+          </summary>
+          <div class="account-menu__dropdown">
+            <form method="post" action="{% url 'logout' %}">
+              {% csrf_token %}
+              <button class="account-menu__logout" type="submit">Log out</button>
+            </form>
+          </div>
+        </details>
       </li>
     {% else %}
       <li>

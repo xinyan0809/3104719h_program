@@ -1,28 +1,87 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}User Profile | PosePlay{% endblock %}
+{% block title %}Profile | PosePlay{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'game/css/profile.css' %}">
+{% endblock %}
 
 {% block content %}
-  <section class="content-card" aria-labelledby="page-title">
-    <header class="page-heading">
-      <p class="eyebrow">Account</p>
-      <h1 id="page-title">User Profile</h1>
-      <p class="page-heading__summary">Your current PosePlay account details.</p>
-    </header>
+  <section class="profile-page" aria-labelledby="page-title">
+    <h1 id="page-title" class="profile-page__title">Profile</h1>
 
-    <div class="stack stack--compact">
-      <div class="panel panel--subtle">
-        <p class="text-small text-muted">Username</p>
-        <p><strong>{{ request.user.username }}</strong></p>
-      </div>
-      <div class="panel panel--subtle">
-        <p class="text-small text-muted">Email</p>
-        <p><strong>{{ request.user.email|default:"Not provided" }}</strong></p>
-      </div>
-    </div>
+    <form class="profile-card" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
 
-    <div class="cluster section--compact">
-      <a class="button button--primary" href="{% url 'game_selection' %}">Play Game</a>
-    </div>
+      <div class="profile-card__avatar-column">
+        <div class="profile-avatar">
+          {% if profile and profile.avatar %}
+            <img src="{{ profile.avatar.url }}" alt="{{ request.user.username }} profile photo">
+          {% else %}
+            <span aria-hidden="true">{{ request.user.username|first|upper }}</span>
+            <span class="visually-hidden">No profile photo uploaded</span>
+          {% endif %}
+        </div>
+
+        {% if is_editing %}
+          <div class="profile-avatar-upload{% if form.avatar.errors %} profile-field--invalid{% endif %}">
+            <label for="{{ form.avatar.id_for_label }}">Change photo</label>
+            {{ form.avatar }}
+            {% if form.avatar.errors %}
+              <ul class="form-errors" role="alert">
+                {% for error in form.avatar.errors %}<li>{{ error }}</li>{% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="profile-card__account">
+        <header class="profile-card__header">
+          <h2>Account information</h2>
+          {% if not is_editing %}
+            <a class="button button--secondary button--small" href="{% url 'user_profile' %}?edit=1">
+              Edit Profile
+            </a>
+          {% endif %}
+        </header>
+
+        {% if is_editing %}
+          <div class="profile-fields">
+            <div class="profile-field{% if form.username.errors %} profile-field--invalid{% endif %}">
+              <label for="{{ form.username.id_for_label }}">Username</label>
+              {{ form.username }}
+              {% if form.username.errors %}
+                <ul class="form-errors" role="alert">
+                  {% for error in form.username.errors %}<li>{{ error }}</li>{% endfor %}
+                </ul>
+              {% endif %}
+            </div>
+
+            <div class="profile-field profile-field--disabled">
+              <label for="{{ form.email.id_for_label }}">Email</label>
+              {{ form.email }}
+            </div>
+          </div>
+
+          <footer class="profile-card__actions">
+            <a class="button button--secondary" href="{% url 'user_profile' %}">Cancel</a>
+            <button class="button button--primary" type="submit">Save changes</button>
+          </footer>
+        {% else %}
+          <dl class="profile-details">
+            <div class="profile-details__row">
+              <dt>Username</dt>
+              <dd>{{ request.user.username }}</dd>
+            </div>
+            <div class="profile-details__row">
+              <dt>Email</dt>
+              <dd>{{ request.user.email|default:"Not provided" }}</dd>
+            </div>
+          </dl>
+        {% endif %}
+      </div>
+    </form>
   </section>
 {% endblock %}
