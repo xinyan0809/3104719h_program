@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Fruit Catch | PosePlay{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'game/css/fruit-catch.css' %}">
+{% endblock %}
+
+{% block content %}
+  <section
+    id="fruit-catch-root"
+    class="content-card content-card--wide fruit-catch"
+    aria-labelledby="page-title"
+    data-module-ready="false"
+  >
+    <div class="fruit-catch__heading">
+      <div>
+        <p class="fruit-catch__eyebrow">Easy difficulty</p>
+        <h1 id="page-title">Fruit Catch</h1>
+        <p>Move your wrists to guide two baskets and catch the falling fruit.</p>
+      </div>
+      <dl class="fruit-hud" aria-label="Game score and time">
+        <div>
+          <dt>Score</dt>
+          <dd id="game-score">0</dd>
+        </div>
+        <div>
+          <dt>Time</dt>
+          <dd><span id="game-time">60</span>s</dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="fruit-controls" aria-label="Fruit Catch controls">
+      <button id="start-camera" class="button button--primary" type="button" disabled>
+        Start Camera
+      </button>
+      <button id="stop-camera" class="button button--secondary" type="button" disabled>
+        Stop Camera
+      </button>
+      <button id="start-game" class="button button--primary" type="button" disabled>
+        Start Game
+      </button>
+    </div>
+
+    <div class="fruit-status-panel" aria-live="polite">
+      <p>
+        Camera/model:
+        <strong id="pose-status" data-status="loading">Loading game module</strong>
+      </p>
+      <p>
+        Game:
+        <strong id="game-status" data-state="idle">Idle</strong>
+      </p>
+      <p id="game-error" class="pose-error" role="alert" hidden></p>
+    </div>
+
+    <div id="fruit-stage" class="fruit-stage" aria-label="Fruit Catch webcam game area">
+      <video id="camera-preview" autoplay muted playsinline></video>
+      <canvas id="pose-overlay" aria-hidden="true"></canvas>
+      <div id="fruit-layer" class="fruit-layer" aria-hidden="true"></div>
+      <div id="left-basket" class="fruit-basket fruit-basket--left" aria-label="Left wrist basket" hidden></div>
+      <div id="right-basket" class="fruit-basket fruit-basket--right" aria-label="Right wrist basket" hidden></div>
+      <div id="game-countdown" class="fruit-countdown" aria-live="assertive" hidden></div>
+    </div>
+
+    <section id="game-finished" class="fruit-finished" aria-labelledby="final-score-title" hidden>
+      <h2 id="final-score-title">Game finished</h2>
+      <p>Final score: <strong id="final-score">0</strong></p>
+      <button id="restart-game" class="button button--primary" type="button" disabled>
+        Play Again
+      </button>
+    </section>
+
+    <p class="pose-privacy">
+      Camera frames, pose landmarks, wrist coordinates, and gameplay calculations
+      stay in this browser. Nothing from this game is sent to Django or saved.
+    </p>
+  </section>
+{% endblock %}
+
+{% block extra_js %}
+  <script type="module" src="{% static 'game/vite/fruit-catch.js' %}"></script>
+{% endblock %}

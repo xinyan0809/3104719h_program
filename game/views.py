@@ -30,6 +30,21 @@ def pose_test(request):
     return render(request, "game/pose_test.html")
 
 
+@login_required
+def fruit_catch(request):
+    return render(request, "game/fruit_catch.html")
+
+
+@login_required
+def game_selection(request):
+    return render(request, "game/game_selection.html")
+
+
+@login_required
+def user_profile(request):
+    return render(request, "game/user_profile.html")
+
+
 def register(request):
     if request.user.is_authenticated:
         return redirect("home")

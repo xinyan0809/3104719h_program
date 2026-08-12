@@ -1,0 +1,110 @@
+.game-library {
+  width: 100%;
+  max-width: 64rem;
+  margin-inline: auto;
+}
+
+.game-library__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 22rem));
+  gap: var(--space-5);
+}
+
+.game-tile {
+  min-height: 22rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-large);
+  display: grid;
+  grid-template-rows: 11rem 1fr;
+  overflow: hidden;
+  color: var(--color-text);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  text-decoration: none;
+  transition:
+    transform var(--transition-standard),
+    border-color var(--transition-standard),
+    box-shadow var(--transition-standard);
+}
+
+.game-tile:hover {
+  border-color: rgba(36, 87, 214, 0.45);
+  color: var(--color-text);
+  box-shadow: var(--shadow-elevated);
+  transform: translateY(-0.2rem);
+}
+
+.game-tile:focus-visible {
+  outline: 3px solid rgba(36, 87, 214, 0.3);
+  outline-offset: 4px;
+}
+
+.game-tile__preview {
+  position: relative;
+  padding: var(--space-5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-around;
+  overflow: hidden;
+  font-size: 2.2rem;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.8), transparent 22%),
+    linear-gradient(145deg, #dff5ff, #eaf0ff 52%, #f4eaff);
+}
+
+.game-tile__preview > span:nth-child(2) {
+  transform: translateY(2.25rem);
+}
+
+.game-tile__preview > span:nth-child(3) {
+  transform: translateY(0.75rem);
+}
+
+.game-tile__basket {
+  position: absolute;
+  right: 50%;
+  bottom: 0.9rem;
+  color: #8a4c22;
+  font-size: 4rem;
+  line-height: 1;
+  transform: translateX(50%);
+}
+
+.game-tile__body {
+  padding: var(--space-5);
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.game-tile__title {
+  margin-top: var(--space-3);
+  font-size: var(--font-size-xl);
+  font-weight: 750;
+  letter-spacing: -0.025em;
+}
+
+.game-tile__description {
+  margin-top: var(--space-2);
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.game-tile__action {
+  margin-top: auto;
+  padding-top: var(--space-4);
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 750;
+}
+
+@media (max-width: 40rem) {
+  .game-library__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .game-tile {
+    min-height: 20rem;
+    grid-template-rows: 10rem 1fr;
+  }
+}
