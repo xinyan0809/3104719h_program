@@ -39,6 +39,11 @@ def fruit_catch(request):
 
 
 @login_required
+def target_shot(request):
+    return render(request, "game/target_shot.html")
+
+
+@login_required
 def game_selection(request):
     return render(request, "game/game_selection.html")
 

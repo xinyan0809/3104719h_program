@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Target Shot | PosePlay{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'game/css/target-shot.css' %}">
+{% endblock %}
+
+{% block content %}
+  <section
+    id="target-shot-root"
+    class="content-card content-card--wide target-shot"
+    aria-labelledby="page-title"
+    data-module-ready="false"
+  >
+    <div class="target-shot__heading">
+      <div>
+        <p class="target-shot__eyebrow">Right-hand aiming</p>
+        <h1 id="page-title">Target Shot</h1>
+        <p>Move the toy gun onto a target and hold briefly to score.</p>
+      </div>
+      <dl class="target-shot__hud" aria-label="Game score and time">
+        <div>
+          <dt>Score</dt>
+          <dd id="target-game-score">0</dd>
+        </div>
+        <div>
+          <dt>Time</dt>
+          <dd><span id="target-game-time">60</span>s</dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="target-shot__controls" aria-label="Target Shot controls">
+      <button id="target-start-camera" class="button button--primary" type="button" disabled>
+        Start Camera
+      </button>
+      <button id="target-stop-camera" class="button button--secondary" type="button" disabled>
+        Stop Camera
+      </button>
+      <button id="target-start-game" class="button button--primary" type="button" disabled>
+        Start Game
+      </button>
+    </div>
+
+    <div class="target-shot__status" aria-live="polite">
+      <p>
+        Camera/model:
+        <strong id="target-pose-status" data-status="loading">Loading game module</strong>
+      </p>
+      <p>
+        Game:
+        <strong id="target-game-status" data-state="idle">Idle</strong>
+      </p>
+      <p id="target-game-error" class="pose-error" role="alert" hidden></p>
+    </div>
+
+    <div id="target-stage" class="target-shot__stage" aria-label="Target Shot webcam game area">
+      <video id="target-camera-preview" autoplay muted playsinline></video>
+      <div id="target-layer" class="target-shot__layer" aria-hidden="true"></div>
+      <div id="target-gun" class="target-shot__gun" aria-label="Right-hand toy gun" hidden>&#x1F52B;</div>
+      <div id="target-countdown" class="target-shot__countdown" aria-live="assertive" hidden></div>
+    </div>
+
+    <section id="target-game-finished" class="target-shot__finished" aria-labelledby="target-final-score-title" hidden>
+      <h2 id="target-final-score-title">Game finished</h2>
+      <p>Final score: <strong id="target-final-score">0</strong></p>
+      <button id="target-restart-game" class="button button--primary" type="button" disabled>
+        Play Again
+      </button>
+    </section>
+
+    <p class="pose-privacy">
+      Camera frames, pose landmarks, right-hand coordinates, and gameplay
+      calculations stay in this browser. Nothing from this game is sent to Django.
+    </p>
+  </section>
+{% endblock %}
+
+{% block extra_js %}
+  <script type="module" src="{% static 'game/vite/target-shot.js' %}"></script>
+{% endblock %}

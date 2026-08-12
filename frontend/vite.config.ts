@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 
 const poseTestEntry = new URL("./src/pose-test/main.ts", import.meta.url);
 const fruitCatchEntry = new URL("./src/fruit-catch/main.ts", import.meta.url);
+const targetShotEntry = new URL("./src/target-shot/main.ts", import.meta.url);
 const cookieNoticeEntry = new URL(
   "./src/site/cookie-notice.ts",
   import.meta.url,
@@ -23,6 +24,7 @@ export default defineConfig({
         "cookie-notice": fileURLToPath(cookieNoticeEntry),
         "fruit-catch": fileURLToPath(fruitCatchEntry),
         "pose-test": fileURLToPath(poseTestEntry),
+        "target-shot": fileURLToPath(targetShotEntry),
       },
       output: {
         entryFileNames: "[name].js",

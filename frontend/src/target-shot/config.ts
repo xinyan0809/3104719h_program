@@ -1,0 +1,17 @@
+export const GAME_DURATION = 60_000;
+export const COUNTDOWN_DURATION = 3_000;
+export const TARGET_SPAWN_INTERVAL = 1_600;
+export const TARGET_LIFETIME = 5_500;
+export const MAX_ACTIVE_TARGETS = 2;
+export const GOLD_TARGET_PROBABILITY = 0.12;
+export const NORMAL_TARGET_SCORE = 1;
+export const GOLD_TARGET_SCORE = 3;
+export const DWELL_TIME = 400;
+export const TARGET_SIZE = 78;
+export const GUN_SIZE = 64;
+export const SMOOTHING_FACTOR = 0.3;
+export const HAND_VISIBILITY_THRESHOLD = 0.55;
+export const TARGET_EDGE_PADDING = 20;
+export const MIN_TARGET_GUN_DISTANCE = 135;
+export const TARGET_SHAKE_DURATION = 130;
+export const FRAGMENT_FALL_DURATION = 470;
