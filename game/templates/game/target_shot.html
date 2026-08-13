@@ -2,79 +2,65 @@
 {% load static %}
 
 {% block title %}Target Shot | PosePlay{% endblock %}
+{% block body_class %}page-game{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'game/css/target-shot.css' %}">
+  <link rel="stylesheet" href="{% static 'game/css/game-shell.css' %}">
 {% endblock %}
 
 {% block content %}
   <section
     id="target-shot-root"
-    class="content-card content-card--wide target-shot"
+    class="game-shell target-shot"
     aria-labelledby="page-title"
     data-module-ready="false"
+    data-game-state="idle"
   >
-    <div class="target-shot__heading">
-      <div>
-        <p class="target-shot__eyebrow">Right-hand aiming</p>
-        <h1 id="page-title">Target Shot</h1>
-        <p>Move the toy gun onto a target and hold briefly to score.</p>
-      </div>
-      <dl class="target-shot__hud" aria-label="Game score and time">
-        <div>
-          <dt>Score</dt>
-          <dd id="target-game-score">0</dd>
-        </div>
-        <div>
-          <dt>Time</dt>
-          <dd><span id="target-game-time">60</span>s</dd>
-        </div>
-      </dl>
-    </div>
-
-    <div class="target-shot__controls" aria-label="Target Shot controls">
-      <button id="target-start-camera" class="button button--primary" type="button" disabled>
-        Start Camera
-      </button>
-      <button id="target-stop-camera" class="button button--secondary" type="button" disabled>
-        Stop Camera
-      </button>
-      <button id="target-start-game" class="button button--primary" type="button" disabled>
-        Start Game
-      </button>
-    </div>
-
-    <div class="target-shot__status" aria-live="polite">
-      <p>
-        Camera/model:
-        <strong id="target-pose-status" data-status="loading">Loading game module</strong>
-      </p>
-      <p>
-        Game:
-        <strong id="target-game-status" data-state="idle">Idle</strong>
-      </p>
-      <p id="target-game-error" class="pose-error" role="alert" hidden></p>
-    </div>
-
-    <div id="target-stage" class="target-shot__stage" aria-label="Target Shot webcam game area">
+    <div id="target-stage" class="game-shell__stage target-shot__stage" aria-label="Target Shot webcam game area">
       <video id="target-camera-preview" autoplay muted playsinline></video>
       <div id="target-layer" class="target-shot__layer" aria-hidden="true"></div>
       <div id="target-gun" class="target-shot__gun" aria-label="Right-hand toy gun" hidden>&#x1F52B;</div>
+
+      <dl class="game-shell__hud" aria-label="Game score and time">
+        <div><dt>Score</dt><dd id="target-game-score">0</dd></div>
+        <div><dt>Time</dt><dd><span id="target-game-time">60</span>s</dd></div>
+      </dl>
+
+      <button id="target-stop-camera" class="button game-shell__stop" type="button" disabled>
+        Stop
+      </button>
+
+      <div class="game-shell__status" aria-live="polite">
+        <span>Camera: <strong id="target-pose-status" data-status="loading">Camera not started</strong></span>
+        <span>Game: <strong id="target-game-status" data-state="idle">Idle</strong></span>
+      </div>
+
+      <div class="game-shell__intro">
+        <div class="game-shell__intro-card">
+          <h1 id="page-title">Target Shot</h1>
+          <p>Move the toy gun with your right hand. Hold it over a target briefly to score.</p>
+          <button id="target-start-camera" class="button button--primary" type="button" disabled>
+            Start Game
+          </button>
+          <p id="target-game-error" class="game-shell__error" role="alert" hidden></p>
+        </div>
+      </div>
+
+      <button id="target-start-game" class="game-shell__internal-control" type="button" hidden>Start</button>
       <div id="target-countdown" class="target-shot__countdown" aria-live="assertive" hidden></div>
+
+      <section id="target-game-finished" class="target-shot__finished game-shell__result" aria-labelledby="target-final-score-title" hidden>
+        <div class="game-shell__result-card">
+          <h2 id="target-final-score-title">Great game!</h2>
+          <p class="game-shell__final-score">Final score <strong id="target-final-score">0</strong></p>
+          <div id="target-star-rating" class="game-shell__rating" role="img" aria-label="0 out of 3 stars">☆☆☆</div>
+          <button id="target-restart-game" class="button button--primary" type="button" disabled>Play Again</button>
+        </div>
+      </section>
     </div>
 
-    <section id="target-game-finished" class="target-shot__finished" aria-labelledby="target-final-score-title" hidden>
-      <h2 id="target-final-score-title">Game finished</h2>
-      <p>Final score: <strong id="target-final-score">0</strong></p>
-      <button id="target-restart-game" class="button button--primary" type="button" disabled>
-        Play Again
-      </button>
-    </section>
-
-    <p class="pose-privacy">
-      Camera frames, pose landmarks, right-hand coordinates, and gameplay
-      calculations stay in this browser. Nothing from this game is sent to Django.
-    </p>
+    <p class="game-shell__privacy">Camera frames and pose data stay in this browser and are not saved.</p>
   </section>
 {% endblock %}
 

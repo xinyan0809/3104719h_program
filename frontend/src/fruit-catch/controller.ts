@@ -1,5 +1,6 @@
 import type { PoseLandmarker } from "@mediapipe/tasks-vision";
 
+import { renderStarRating } from "../game-shell/rating";
 import { CameraController } from "../pose-test/camera";
 import {
   closePoseLandmarker,
@@ -30,6 +31,7 @@ interface FruitCatchElements {
   countdown: HTMLElement;
   finishedPanel: HTMLElement;
   finalScore: HTMLElement;
+  rating: HTMLElement;
 }
 
 export function mountFruitCatch(): void {
@@ -74,11 +76,19 @@ export function mountFruitCatch(): void {
   const updateControls = (_state?: GameState): void => {
     const state = game?.state ?? "IDLE";
     const ready = isGameReady();
+    elements.root.dataset.gameState = state.toLowerCase();
+    elements.startCameraButton.textContent = isStarting
+      ? "Starting..."
+      : "Start Game";
     elements.startCameraButton.disabled = isStarting || camera.isRunning;
     elements.stopCameraButton.disabled = !camera.isRunning;
     elements.startGameButton.disabled = !ready || state !== "IDLE";
     elements.restartGameButton.disabled = !ready || state !== "FINISHED";
     elements.root.dataset.modelReady = String(ready);
+    if (state === "FINISHED" || state === "IDLE") {
+      const score = state === "FINISHED" ? Number(elements.finalScore.textContent) : 0;
+      renderStarRating(elements.rating, score, [5, 12, 20]);
+    }
   };
 
   game = new EasyFruitCatchGame(
@@ -174,7 +184,7 @@ export function mountFruitCatch(): void {
       detectionLoop.start();
       setPoseStatus("No pose detected", "ready");
       elements.gameStatus.textContent = "Ready to start";
-      updateControls();
+      beginGame();
     } catch (error) {
       if (currentOperation === operationVersion) {
         releaseCameraAndPose();
@@ -238,5 +248,6 @@ function getElements(): FruitCatchElements | null {
     countdown: requireFromRoot<HTMLElement>("#game-countdown"),
     finishedPanel: requireFromRoot<HTMLElement>("#game-finished"),
     finalScore: requireFromRoot<HTMLElement>("#final-score"),
+    rating: requireFromRoot<HTMLElement>("#fruit-star-rating"),
   };
 }

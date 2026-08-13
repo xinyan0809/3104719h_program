@@ -1,5 +1,6 @@
 import type { PoseLandmarker } from "@mediapipe/tasks-vision";
 
+import { renderStarRating } from "../game-shell/rating";
 import { CameraController } from "../pose-test/camera";
 import { HorizontalMovementTracker } from "../pose-test/movement";
 import {
@@ -29,6 +30,7 @@ interface BodyDodgeElements {
   countdown: HTMLElement;
   finishedPanel: HTMLElement;
   finalScore: HTMLElement;
+  rating: HTMLElement;
 }
 
 export function mountBodyDodge(): void {
@@ -70,11 +72,19 @@ export function mountBodyDodge(): void {
   const updateControls = (_state?: BodyDodgeGameState): void => {
     const state = game?.state ?? "IDLE";
     const ready = isGameReady();
+    elements.root.dataset.gameState = state.toLowerCase();
+    elements.startCameraButton.textContent = isStarting
+      ? "Starting..."
+      : "Start Game";
     elements.startCameraButton.disabled = isStarting || camera.isRunning;
     elements.stopCameraButton.disabled = !camera.isRunning;
     elements.startGameButton.disabled = !ready || state !== "IDLE";
     elements.restartGameButton.disabled = !ready || state !== "FINISHED";
     elements.root.dataset.modelReady = String(ready);
+    if (state === "FINISHED" || state === "IDLE") {
+      const score = state === "FINISHED" ? Number(elements.finalScore.textContent) : 0;
+      renderStarRating(elements.rating, score, [5, 12, 20]);
+    }
   };
 
   game = new BodyDodgeGame(
@@ -182,7 +192,7 @@ export function mountBodyDodge(): void {
       detectionLoop.start();
       setPoseStatus("No pose detected", "ready");
       elements.gameStatus.textContent = "Ready to start";
-      updateControls();
+      beginGame();
     } catch (error) {
       if (currentOperation === operationVersion) {
         releaseCameraAndPose();
@@ -249,5 +259,6 @@ function getElements(): BodyDodgeElements | null {
     countdown: requireFromRoot<HTMLElement>("#dodge-countdown"),
     finishedPanel: requireFromRoot<HTMLElement>("#dodge-game-finished"),
     finalScore: requireFromRoot<HTMLElement>("#dodge-final-score"),
+    rating: requireFromRoot<HTMLElement>("#dodge-star-rating"),
   };
 }
