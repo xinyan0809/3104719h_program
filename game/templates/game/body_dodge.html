@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Body Dodge | PosePlay{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'game/css/body-dodge.css' %}">
+{% endblock %}
+
+{% block content %}
+  <section
+    id="body-dodge-root"
+    class="content-card content-card--wide body-dodge"
+    aria-labelledby="page-title"
+    data-module-ready="false"
+  >
+    <div class="body-dodge__heading">
+      <div>
+        <p class="body-dodge__eyebrow">Three-lane movement</p>
+        <h1 id="page-title">Body Dodge</h1>
+        <p>Move your body left, centre or right to avoid falling obstacles.</p>
+      </div>
+      <dl class="body-dodge__hud" aria-label="Game score and time">
+        <div>
+          <dt>Score</dt>
+          <dd id="dodge-game-score">0</dd>
+        </div>
+        <div>
+          <dt>Time</dt>
+          <dd><span id="dodge-game-time">60</span>s</dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="body-dodge__controls" aria-label="Body Dodge controls">
+      <button id="dodge-start-camera" class="button button--primary" type="button" disabled>
+        Start Camera
+      </button>
+      <button id="dodge-stop-camera" class="button button--secondary" type="button" disabled>
+        Stop Camera
+      </button>
+      <button id="dodge-start-game" class="button button--primary" type="button" disabled>
+        Start Game
+      </button>
+    </div>
+
+    <div class="body-dodge__status" aria-live="polite">
+      <p>
+        Camera/model:
+        <strong id="dodge-pose-status" data-status="loading">Loading game module</strong>
+      </p>
+      <p>
+        Movement:
+        <strong id="dodge-movement-state" data-movement="unknown">&mdash;</strong>
+      </p>
+      <p>
+        Game:
+        <strong id="dodge-game-status" data-state="idle">Idle</strong>
+      </p>
+      <p id="dodge-game-error" class="pose-error" role="alert" hidden></p>
+    </div>
+
+    <div id="dodge-stage" class="body-dodge__stage" aria-label="Body Dodge webcam game area">
+      <video id="dodge-camera-preview" autoplay muted playsinline></video>
+      <div class="body-dodge__lanes" aria-hidden="true">
+        <span>LEFT</span>
+        <span>CENTRE</span>
+        <span>RIGHT</span>
+      </div>
+      <div id="dodge-obstacle-layer" class="body-dodge__obstacle-layer" aria-hidden="true"></div>
+      <div id="dodge-player" class="body-dodge__player" aria-label="Player">&#x1F3C3;</div>
+      <div id="dodge-countdown" class="body-dodge__countdown" aria-live="assertive" hidden></div>
+    </div>
+
+    <section id="dodge-game-finished" class="body-dodge__finished" aria-labelledby="dodge-final-score-title" hidden>
+      <h2 id="dodge-final-score-title">Game finished</h2>
+      <p>Final score: <strong id="dodge-final-score">0</strong></p>
+      <button id="dodge-restart-game" class="button button--primary" type="button" disabled>
+        Play Again
+      </button>
+    </section>
+
+    <p class="pose-privacy">
+      Camera frames, pose landmarks, body position and lane calculations stay
+      in this browser. Nothing from this game is sent to Django.
+    </p>
+  </section>
+{% endblock %}
+
+{% block extra_js %}
+  <script type="module" src="{% static 'game/vite/body-dodge.js' %}"></script>
+{% endblock %}
