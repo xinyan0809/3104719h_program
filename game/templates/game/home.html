@@ -1,10 +1,112 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Home | PosePlay{% endblock %}
+{% block body_class %}page-home{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'game/css/home.css' %}?v=20260815-3">
+{% endblock %}
 
 {% block content %}
-  <section class="content-card" aria-labelledby="page-title">
-    <h1 id="page-title">Welcome, {{ request.user.username }}</h1>
-    <p>You are signed in. This is your home page.</p>
+  <section class="home-dashboard" aria-labelledby="page-title">
+    <header class="home-dashboard__header">
+      <h1 id="page-title">Hello, {{ request.user.username }}</h1>
+      <p>Ready to move? Choose a game and play using your webcam.</p>
+    </header>
+
+    <div class="home-dashboard__grid">
+      <section class="home-games" aria-labelledby="featured-games-title">
+        <header class="home-section-heading">
+          <h2 id="featured-games-title">Choose a game</h2>
+          <p>The games rotate automatically. Hover or focus a card to pause.</p>
+        </header>
+
+        <div class="home-game-carousel">
+          <div class="home-game-carousel__track">
+            <a class="home-game-card home-game-card--fruit" href="{% url 'fruit_catch' %}">
+              <span class="home-game-card__visual" aria-hidden="true">
+                <span class="home-game-card__icons"><span>&#x1F34E;</span><span>&#x1F34A;</span><span>&#x1F9FA;</span></span>
+              </span>
+              <span class="home-game-card__content">
+                <span class="badge badge--success">Both wrists</span>
+                <span class="home-game-card__title">Fruit Catch</span>
+                <span class="home-game-card__description">Guide two baskets and catch the falling fruit.</span>
+                <span class="home-game-card__action">Play now <span aria-hidden="true">&#x2192;</span></span>
+              </span>
+            </a>
+
+            <a class="home-game-card home-game-card--target" href="{% url 'target_shot' %}">
+              <span class="home-game-card__visual" aria-hidden="true">
+                <span class="home-game-card__icons"><span>&#x1F3AF;</span><span>&#x1F52B;</span><span>&#x2B50;</span></span>
+              </span>
+              <span class="home-game-card__content">
+                <span class="badge badge--primary">Right hand</span>
+                <span class="home-game-card__title">Target Shot</span>
+                <span class="home-game-card__description">Aim with your right hand and hold over targets.</span>
+                <span class="home-game-card__action">Play now <span aria-hidden="true">&#x2192;</span></span>
+              </span>
+            </a>
+
+            <a class="home-game-card home-game-card--dodge" href="{% url 'body_dodge' %}">
+              <span class="home-game-card__visual" aria-hidden="true">
+                <span class="home-game-card__icons"><span>&#x1F6A7;</span><span>&#x1F3C3;</span><span>&#x26BD;</span></span>
+              </span>
+              <span class="home-game-card__content">
+                <span class="badge badge--warning">Whole body</span>
+                <span class="home-game-card__title">Body Dodge</span>
+                <span class="home-game-card__description">Move between three lanes and avoid obstacles.</span>
+                <span class="home-game-card__action">Play now <span aria-hidden="true">&#x2192;</span></span>
+              </span>
+            </a>
+
+            <a class="home-game-card home-game-card--fruit" href="{% url 'fruit_catch' %}" aria-hidden="true" tabindex="-1">
+              <span class="home-game-card__visual" aria-hidden="true">
+                <span class="home-game-card__icons"><span>&#x1F34E;</span><span>&#x1F34A;</span><span>&#x1F9FA;</span></span>
+              </span>
+              <span class="home-game-card__content">
+                <span class="badge badge--success">Both wrists</span>
+                <span class="home-game-card__title">Fruit Catch</span>
+                <span class="home-game-card__description">Guide two baskets and catch the falling fruit.</span>
+                <span class="home-game-card__action">Play now <span aria-hidden="true">&#x2192;</span></span>
+              </span>
+            </a>
+          </div>
+        </div>
+
+        <div class="home-games__footer">
+          <span class="home-carousel-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+          <a class="home-games__all" href="{% url 'game_selection' %}">View all games</a>
+        </div>
+      </section>
+
+      <aside class="home-guide" aria-labelledby="how-it-works-title">
+        <p class="eyebrow">How it works</p>
+        <h2 id="how-it-works-title">Your body is the controller</h2>
+        <p class="home-guide__intro">
+          PosePlay turns movements detected by a standard webcam into simple browser game controls.
+        </p>
+
+        <ol class="home-guide__steps">
+          <li class="home-guide__step">
+            <h3>Choose a game</h3>
+            <p>Pick Fruit Catch, Target Shot or Body Dodge from the rotating cards.</p>
+          </li>
+          <li class="home-guide__step">
+            <h3>Start your camera</h3>
+            <p>Press Start Game and allow camera access so MediaPipe can detect your pose.</p>
+          </li>
+          <li class="home-guide__step">
+            <h3>Move and play</h3>
+            <p>Follow the short instructions and use your wrists, right hand or whole body.</p>
+          </li>
+        </ol>
+
+        <p class="home-guide__privacy">
+          <span aria-hidden="true">&#x1F512;</span>
+          Webcam frames and body coordinates are processed locally in your browser.
+        </p>
+      </aside>
+    </div>
   </section>
 {% endblock %}
