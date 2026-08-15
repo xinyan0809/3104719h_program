@@ -3,14 +3,15 @@
 
 {% block title %}Play Game | PosePlay{% endblock %}
 
+{% block body_class %}page-game-library{% endblock %}
+
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'game/css/game-library.css' %}">
+  <link rel="stylesheet" href="{% static 'game/css/game-library.css' %}?v=20260815-1">
 {% endblock %}
 
 {% block content %}
   <section class="game-library" aria-labelledby="page-title">
     <header class="page-heading">
-      <p class="eyebrow">Game library</p>
       <h1 id="page-title" class="page-heading__title">Choose a game</h1>
       <p class="page-heading__summary">
         Select a game first. Camera access is only requested after you enter the
