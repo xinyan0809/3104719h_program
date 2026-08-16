@@ -3,14 +3,15 @@
 
 {% block title %}Play Game | PosePlay{% endblock %}
 
+{% block body_class %}page-game-library{% endblock %}
+
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'game/css/game-library.css' %}">
+  <link rel="stylesheet" href="{% static 'game/css/game-library.css' %}?v=20260815-1">
 {% endblock %}
 
 {% block content %}
   <section class="game-library" aria-labelledby="page-title">
     <header class="page-heading">
-      <p class="eyebrow">Game library</p>
       <h1 id="page-title" class="page-heading__title">Choose a game</h1>
       <p class="page-heading__summary">
         Select a game first. Camera access is only requested after you enter the
@@ -47,6 +48,22 @@
           <span class="game-tile__title">Target Shot</span>
           <span class="game-tile__description">
             Aim a toy gun with your right hand and hold over targets to score.
+          </span>
+          <span class="game-tile__action">Play game <span aria-hidden="true">&#x2192;</span></span>
+        </span>
+      </a>
+
+      <a class="game-tile" href="{% url 'body_dodge' %}">
+        <span class="game-tile__preview" aria-hidden="true">
+          <span>&#x1F3C3;</span>
+          <span>&#x1F6A7;</span>
+          <span>&#x26BD;</span>
+        </span>
+        <span class="game-tile__body">
+          <span class="badge badge--success">Three lanes</span>
+          <span class="game-tile__title">Body Dodge</span>
+          <span class="game-tile__description">
+            Move your body left, centre or right to avoid falling obstacles.
           </span>
           <span class="game-tile__action">Play game <span aria-hidden="true">&#x2192;</span></span>
         </span>

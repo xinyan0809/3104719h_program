@@ -44,6 +44,11 @@ def target_shot(request):
 
 
 @login_required
+def body_dodge(request):
+    return render(request, "game/body_dodge.html")
+
+
+@login_required
 def game_selection(request):
     return render(request, "game/game_selection.html")
 

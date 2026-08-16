@@ -1,12 +1,16 @@
+.page-game-library .site-main {
+  padding-top: var(--space-5);
+}
+
 .game-library {
   width: 100%;
-  max-width: 64rem;
+  max-width: 72rem;
   margin-inline: auto;
 }
 
 .game-library__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 22rem));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-5);
 }
 
@@ -98,7 +102,7 @@
   font-weight: 750;
 }
 
-@media (max-width: 40rem) {
+@media (max-width: 48rem) {
   .game-library__grid {
     grid-template-columns: 1fr;
   }

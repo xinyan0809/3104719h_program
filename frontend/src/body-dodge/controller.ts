@@ -2,16 +2,16 @@ import type { PoseLandmarker } from "@mediapipe/tasks-vision";
 
 import { renderStarRating } from "../game-shell/rating";
 import { CameraController } from "../pose-test/camera";
+import { HorizontalMovementTracker } from "../pose-test/movement";
 import {
   closePoseLandmarker,
   loadPoseLandmarker,
 } from "../pose-test/pose-landmarker";
 import { PoseDetectionLoop } from "../pose-test/pose-loop";
-import { PoseRenderer } from "../pose-test/pose-renderer";
-import { EasyFruitCatchGame, type GameState } from "./game";
-import { WristBasketController } from "./wrist-baskets";
+import { BodyDodgeGame, type BodyDodgeGameState } from "./game";
+import { LanePlayerController } from "./lane-player";
 
-interface FruitCatchElements {
+interface BodyDodgeElements {
   root: HTMLElement;
   stage: HTMLElement;
   startCameraButton: HTMLButtonElement;
@@ -19,13 +19,12 @@ interface FruitCatchElements {
   startGameButton: HTMLButtonElement;
   restartGameButton: HTMLButtonElement;
   video: HTMLVideoElement;
-  canvas: HTMLCanvasElement;
   poseStatus: HTMLElement;
   gameStatus: HTMLElement;
+  movement: HTMLElement;
   error: HTMLElement;
-  leftBasket: HTMLElement;
-  rightBasket: HTMLElement;
-  fruitLayer: HTMLElement;
+  player: HTMLElement;
+  obstacleLayer: HTMLElement;
   score: HTMLElement;
   time: HTMLElement;
   countdown: HTMLElement;
@@ -34,26 +33,21 @@ interface FruitCatchElements {
   rating: HTMLElement;
 }
 
-export function mountFruitCatch(): void {
+export function mountBodyDodge(): void {
   const elements = getElements();
   if (!elements) {
     return;
   }
 
   const camera = new CameraController();
-  const renderer = new PoseRenderer(elements.canvas);
-  const baskets = new WristBasketController(
-    elements.stage,
-    elements.leftBasket,
-    elements.rightBasket,
-  );
-
+  const movementTracker = new HorizontalMovementTracker();
+  const player = new LanePlayerController(elements.stage, elements.player);
   let landmarker: PoseLandmarker | null = null;
   let detectionLoop: PoseDetectionLoop | null = null;
   let isStarting = false;
   let modelReady = false;
   let operationVersion = 0;
-  let game: EasyFruitCatchGame;
+  let game: BodyDodgeGame;
 
   const isGameReady = (): boolean => modelReady && camera.isRunning;
 
@@ -69,11 +63,13 @@ export function mountFruitCatch(): void {
 
   const showError = (error: unknown): void => {
     elements.error.textContent =
-      error instanceof Error ? error.message : "An unexpected camera error occurred.";
+      error instanceof Error
+        ? error.message
+        : "An unexpected camera error occurred.";
     elements.error.hidden = false;
   };
 
-  const updateControls = (_state?: GameState): void => {
+  const updateControls = (_state?: BodyDodgeGameState): void => {
     const state = game?.state ?? "IDLE";
     const ready = isGameReady();
     elements.root.dataset.gameState = state.toLowerCase();
@@ -91,18 +87,19 @@ export function mountFruitCatch(): void {
     }
   };
 
-  game = new EasyFruitCatchGame(
+  game = new BodyDodgeGame(
     {
       stage: elements.stage,
-      fruitLayer: elements.fruitLayer,
+      obstacleLayer: elements.obstacleLayer,
       score: elements.score,
       time: elements.time,
       countdown: elements.countdown,
       status: elements.gameStatus,
+      movement: elements.movement,
       finishedPanel: elements.finishedPanel,
       finalScore: elements.finalScore,
     },
-    baskets,
+    player,
     isGameReady,
     updateControls,
   );
@@ -111,8 +108,9 @@ export function mountFruitCatch(): void {
     detectionLoop?.stop();
     detectionLoop = null;
     camera.stop(elements.video);
-    renderer.clear();
-    baskets.reset();
+    movementTracker.reset();
+    player.reset();
+    game.updateMovement(null);
     modelReady = false;
     game.cancel();
   };
@@ -129,7 +127,9 @@ export function mountFruitCatch(): void {
   const beginGame = (): void => {
     clearError();
     if (!isGameReady()) {
-      showError(new Error("Start the camera and wait for the pose model before playing."));
+      showError(
+        new Error("Start the camera and wait for the pose model before playing."),
+      );
       updateControls();
       return;
     }
@@ -153,7 +153,7 @@ export function mountFruitCatch(): void {
       if (currentOperation !== operationVersion || !camera.isRunning) {
         return;
       }
-      baskets.syncStageToVideo(elements.video);
+      player.syncStageToVideo(elements.video);
       updateControls();
 
       const loadedLandmarker = await loadPoseLandmarker();
@@ -167,12 +167,20 @@ export function mountFruitCatch(): void {
         elements.video,
         landmarker,
         (result) => {
-          const poseDetected = renderer.draw(result, elements.video);
-          baskets.update(result.landmarks[0]);
-          setPoseStatus(
-            poseDetected ? "Pose detected" : "No pose detected",
-            poseDetected ? "detected" : "ready",
+          const landmarks = result.landmarks[0];
+          const movement = movementTracker.update(
+            landmarks,
+            performance.now(),
           );
+          game.updateMovement(movement);
+
+          if (!landmarks) {
+            setPoseStatus("No pose detected", "ready");
+          } else if (movement) {
+            setPoseStatus("Body position detected", "detected");
+          } else {
+            setPoseStatus("Body position unavailable", "ready");
+          }
         },
         (error) => {
           releaseCameraAndPose();
@@ -214,8 +222,8 @@ export function mountFruitCatch(): void {
   updateControls();
 }
 
-function getElements(): FruitCatchElements | null {
-  const root = document.querySelector<HTMLElement>("#fruit-catch-root");
+function getElements(): BodyDodgeElements | null {
+  const root = document.querySelector<HTMLElement>("#body-dodge-root");
   if (!root) {
     return null;
   }
@@ -223,31 +231,34 @@ function getElements(): FruitCatchElements | null {
   const requireFromRoot = <T extends Element>(selector: string): T => {
     const element = root.querySelector<T>(selector);
     if (!element) {
-      throw new Error(`Fruit Catch element is missing: ${selector}`);
+      throw new Error(`Body Dodge element is missing: ${selector}`);
     }
     return element;
   };
 
   return {
     root,
-    stage: requireFromRoot<HTMLElement>("#fruit-stage"),
-    startCameraButton: requireFromRoot<HTMLButtonElement>("#start-camera"),
-    stopCameraButton: requireFromRoot<HTMLButtonElement>("#stop-camera"),
-    startGameButton: requireFromRoot<HTMLButtonElement>("#start-game"),
-    restartGameButton: requireFromRoot<HTMLButtonElement>("#restart-game"),
-    video: requireFromRoot<HTMLVideoElement>("#camera-preview"),
-    canvas: requireFromRoot<HTMLCanvasElement>("#pose-overlay"),
-    poseStatus: requireFromRoot<HTMLElement>("#pose-status"),
-    gameStatus: requireFromRoot<HTMLElement>("#game-status"),
-    error: requireFromRoot<HTMLElement>("#game-error"),
-    leftBasket: requireFromRoot<HTMLElement>("#left-basket"),
-    rightBasket: requireFromRoot<HTMLElement>("#right-basket"),
-    fruitLayer: requireFromRoot<HTMLElement>("#fruit-layer"),
-    score: requireFromRoot<HTMLElement>("#game-score"),
-    time: requireFromRoot<HTMLElement>("#game-time"),
-    countdown: requireFromRoot<HTMLElement>("#game-countdown"),
-    finishedPanel: requireFromRoot<HTMLElement>("#game-finished"),
-    finalScore: requireFromRoot<HTMLElement>("#final-score"),
-    rating: requireFromRoot<HTMLElement>("#fruit-star-rating"),
+    stage: requireFromRoot<HTMLElement>("#dodge-stage"),
+    startCameraButton:
+      requireFromRoot<HTMLButtonElement>("#dodge-start-camera"),
+    stopCameraButton:
+      requireFromRoot<HTMLButtonElement>("#dodge-stop-camera"),
+    startGameButton:
+      requireFromRoot<HTMLButtonElement>("#dodge-start-game"),
+    restartGameButton:
+      requireFromRoot<HTMLButtonElement>("#dodge-restart-game"),
+    video: requireFromRoot<HTMLVideoElement>("#dodge-camera-preview"),
+    poseStatus: requireFromRoot<HTMLElement>("#dodge-pose-status"),
+    gameStatus: requireFromRoot<HTMLElement>("#dodge-game-status"),
+    movement: requireFromRoot<HTMLElement>("#dodge-movement-state"),
+    error: requireFromRoot<HTMLElement>("#dodge-game-error"),
+    player: requireFromRoot<HTMLElement>("#dodge-player"),
+    obstacleLayer: requireFromRoot<HTMLElement>("#dodge-obstacle-layer"),
+    score: requireFromRoot<HTMLElement>("#dodge-game-score"),
+    time: requireFromRoot<HTMLElement>("#dodge-game-time"),
+    countdown: requireFromRoot<HTMLElement>("#dodge-countdown"),
+    finishedPanel: requireFromRoot<HTMLElement>("#dodge-game-finished"),
+    finalScore: requireFromRoot<HTMLElement>("#dodge-final-score"),
+    rating: requireFromRoot<HTMLElement>("#dodge-star-rating"),
   };
 }

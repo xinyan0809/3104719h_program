@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Body Dodge | PosePlay{% endblock %}
+{% block body_class %}page-game{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'game/css/body-dodge.css' %}">
+  <link rel="stylesheet" href="{% static 'game/css/game-shell.css' %}">
+{% endblock %}
+
+{% block content %}
+  <section
+    id="body-dodge-root"
+    class="game-shell body-dodge"
+    aria-labelledby="page-title"
+    data-module-ready="false"
+    data-game-state="idle"
+  >
+    <div id="dodge-stage" class="game-shell__stage body-dodge__stage" aria-label="Body Dodge webcam game area">
+      <video id="dodge-camera-preview" autoplay muted playsinline></video>
+      <div class="body-dodge__lanes" aria-hidden="true">
+        <span>LEFT</span><span>CENTRE</span><span>RIGHT</span>
+      </div>
+      <div id="dodge-obstacle-layer" class="body-dodge__obstacle-layer" aria-hidden="true"></div>
+      <div id="dodge-player" class="body-dodge__player" aria-label="Player">&#x1F3C3;</div>
+
+      <dl class="game-shell__hud" aria-label="Game score and time">
+        <div><dt>Score</dt><dd id="dodge-game-score">0</dd></div>
+        <div><dt>Time</dt><dd><span id="dodge-game-time">60</span>s</dd></div>
+      </dl>
+
+      <button id="dodge-stop-camera" class="button game-shell__stop" type="button" disabled>
+        Stop
+      </button>
+
+      <div class="game-shell__status" aria-live="polite">
+        <span>Camera: <strong id="dodge-pose-status" data-status="loading">Camera not started</strong></span>
+        <span>Position: <strong id="dodge-movement-state" data-movement="unknown">&mdash;</strong></span>
+        <span class="visually-hidden">Game: <strong id="dodge-game-status" data-state="idle">Idle</strong></span>
+      </div>
+
+      <div class="game-shell__intro">
+        <div class="game-shell__intro-card">
+          <h1 id="page-title">Body Dodge</h1>
+          <p>Move your whole body left, centre or right. Switch lanes to avoid the falling obstacles.</p>
+          <button id="dodge-start-camera" class="button button--primary" type="button" disabled>
+            Start Game
+          </button>
+          <p id="dodge-game-error" class="game-shell__error" role="alert" hidden></p>
+        </div>
+      </div>
+
+      <button id="dodge-start-game" class="game-shell__internal-control" type="button" hidden>Start</button>
+      <div id="dodge-countdown" class="body-dodge__countdown" aria-live="assertive" hidden></div>
+
+      <section id="dodge-game-finished" class="body-dodge__finished game-shell__result" aria-labelledby="dodge-final-score-title" hidden>
+        <div class="game-shell__result-card">
+          <h2 id="dodge-final-score-title">Great game!</h2>
+          <p class="game-shell__final-score">Final score <strong id="dodge-final-score">0</strong></p>
+          <div id="dodge-star-rating" class="game-shell__rating" role="img" aria-label="0 out of 3 stars">☆☆☆</div>
+          <button id="dodge-restart-game" class="button button--primary" type="button" disabled>Play Again</button>
+        </div>
+      </section>
+    </div>
+
+    <p class="game-shell__privacy">Camera frames and pose data stay in this browser and are not saved.</p>
+  </section>
+{% endblock %}
+
+{% block extra_js %}
+  <script type="module" src="{% static 'game/vite/body-dodge.js' %}"></script>
+{% endblock %}
