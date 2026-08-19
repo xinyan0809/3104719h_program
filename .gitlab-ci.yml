@@ -1,0 +1,17 @@
+stages:
+  - sync
+
+sync_from_github:
+  stage: sync
+  image: alpine:3.22
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+  before_script:
+    - apk add --no-cache ca-certificates git
+  script:
+    - git remote add github https://github.com/xinyan0809/3104719h_program.git
+    - git fetch --prune github '+refs/heads/*:refs/remotes/github/*' '+refs/tags/*:refs/tags/*'
+    - git remote set-url --push origin "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+    - git push --force --prune origin '+refs/remotes/github/*:refs/heads/*'
+    - git push --force origin '+refs/tags/*:refs/tags/*'
