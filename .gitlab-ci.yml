@@ -12,6 +12,7 @@ sync_from_github:
   script:
     - git remote add github https://github.com/xinyan0809/3104719h_program.git
     - git fetch --prune github '+refs/heads/*:refs/remotes/github/*' '+refs/tags/*:refs/tags/*'
+    - git update-ref -d refs/remotes/github/HEAD
     - git remote set-url --push origin "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
     - git push --force --prune origin '+refs/remotes/github/*:refs/heads/*'
     - git push --force origin '+refs/tags/*:refs/tags/*'
