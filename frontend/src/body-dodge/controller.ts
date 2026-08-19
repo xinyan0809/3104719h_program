@@ -1,6 +1,7 @@
 import type { PoseLandmarker } from "@mediapipe/tasks-vision";
 
 import { renderStarRating } from "../game-shell/rating";
+import { saveCompletedGame } from "../game-shell/records";
 import { CameraController } from "../pose-test/camera";
 import { HorizontalMovementTracker } from "../pose-test/movement";
 import {
@@ -8,6 +9,7 @@ import {
   loadPoseLandmarker,
 } from "../pose-test/pose-landmarker";
 import { PoseDetectionLoop } from "../pose-test/pose-loop";
+import { GAME_DURATION } from "./config";
 import { BodyDodgeGame, type BodyDodgeGameState } from "./game";
 import { LanePlayerController } from "./lane-player";
 
@@ -69,7 +71,7 @@ export function mountBodyDodge(): void {
     elements.error.hidden = false;
   };
 
-  const updateControls = (_state?: BodyDodgeGameState): void => {
+  const updateControls = (stateChange?: BodyDodgeGameState): void => {
     const state = game?.state ?? "IDLE";
     const ready = isGameReady();
     elements.root.dataset.gameState = state.toLowerCase();
@@ -84,6 +86,24 @@ export function mountBodyDodge(): void {
     if (state === "FINISHED" || state === "IDLE") {
       const score = state === "FINISHED" ? Number(elements.finalScore.textContent) : 0;
       renderStarRating(elements.rating, score, [5, 12, 20]);
+    }
+    if (stateChange === "FINISHED") {
+      const score = Number(elements.finalScore.textContent);
+      void saveCompletedGame(elements.root, {
+        gameId: "body-dodge",
+        score,
+        durationSeconds: Math.round(GAME_DURATION / 1_000),
+      })
+        .then(() => {
+          if (game.state === "FINISHED") {
+            elements.gameStatus.textContent = "Finished — record saved";
+          }
+        })
+        .catch(() => {
+          if (game.state === "FINISHED") {
+            elements.gameStatus.textContent = "Finished — record not saved";
+          }
+        });
     }
   };
 

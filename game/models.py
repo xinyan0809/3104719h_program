@@ -25,3 +25,35 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"Profile for {self.user.get_username()}"
+
+
+class GameRecord(models.Model):
+    class Game(models.TextChoices):
+        FRUIT_CATCH = "fruit-catch", "Fruit Catch"
+        TARGET_SHOT = "target-shot", "Target Shot"
+        BODY_DODGE = "body-dodge", "Body Dodge"
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="game_records",
+    )
+    game_id = models.CharField(max_length=20, choices=Game.choices)
+    score = models.PositiveIntegerField()
+    duration_seconds = models.PositiveIntegerField()
+    played_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-played_at", "-pk"]
+        indexes = [
+            models.Index(
+                fields=["user", "-played_at", "-id"],
+                name="game_record_user_time_idx",
+            ),
+        ]
+
+    def __str__(self):
+        return (
+            f"{self.user.get_username()} - "
+            f"{self.get_game_id_display()} ({self.score})"
+        )

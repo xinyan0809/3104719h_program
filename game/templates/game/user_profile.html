@@ -83,5 +83,60 @@
         {% endif %}
       </div>
     </form>
+
+    <section class="profile-records" aria-labelledby="records-title">
+      <header class="profile-records__header">
+        <div>
+          <h2 id="records-title">Game records</h2>
+          <p>Your personal best scores and recently completed games.</p>
+        </div>
+        <a class="button button--secondary button--small" href="{% url 'game_selection' %}">
+          Play a game
+        </a>
+      </header>
+
+      <div class="profile-records__bests" aria-label="Personal best scores">
+        {% for summary in record_summaries %}
+          <article class="profile-record">
+            <p class="profile-record__game">{{ summary.label }}</p>
+            <p class="profile-record__score">
+              {% if summary.best_score is not None %}
+                {{ summary.best_score }}
+              {% else %}
+                &mdash;
+              {% endif %}
+            </p>
+            <p class="profile-record__meta">
+              Best score · {{ summary.play_count }} play{{ summary.play_count|pluralize }}
+            </p>
+          </article>
+        {% endfor %}
+      </div>
+
+      <div class="profile-history">
+        <h3>Recent games</h3>
+        {% if recent_records %}
+          <ul class="profile-history__list">
+            {% for record in recent_records %}
+              <li>
+                <div>
+                  <strong>{{ record.get_game_id_display }}</strong>
+                  <time datetime="{{ record.played_at|date:'c' }}">
+                    {{ record.played_at|date:"d M Y, H:i" }}
+                  </time>
+                </div>
+                <span><strong>{{ record.score }}</strong> points</span>
+                <span>{{ record.duration_seconds }} seconds</span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="profile-history__empty">
+            <p>No game records yet.</p>
+            <span>Finish a game and your result will appear here.</span>
+          </div>
+        {% endif %}
+      </div>
+    </section>
   </section>
 {% endblock %}

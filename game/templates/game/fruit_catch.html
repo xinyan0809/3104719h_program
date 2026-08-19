@@ -16,6 +16,7 @@
     aria-labelledby="page-title"
     data-module-ready="false"
     data-game-state="idle"
+    data-record-url="{% url 'save_game_record' %}"
   >
     <div id="fruit-stage" class="game-shell__stage fruit-stage" aria-label="Fruit Catch webcam game area">
       <video id="camera-preview" autoplay muted playsinline></video>
@@ -62,7 +63,7 @@
       </section>
     </div>
 
-    <p class="game-shell__privacy">Camera frames and pose data stay in this browser and are not saved.</p>
+    <p class="game-shell__privacy">Camera frames and pose data stay in this browser. Only the game name, final score and play time are saved to your account.</p>
   </section>
 {% endblock %}
 

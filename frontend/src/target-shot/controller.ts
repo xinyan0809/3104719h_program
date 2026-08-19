@@ -1,12 +1,14 @@
 import type { PoseLandmarker } from "@mediapipe/tasks-vision";
 
 import { renderStarRating } from "../game-shell/rating";
+import { saveCompletedGame } from "../game-shell/records";
 import { CameraController } from "../pose-test/camera";
 import {
   closePoseLandmarker,
   loadPoseLandmarker,
 } from "../pose-test/pose-landmarker";
 import { PoseDetectionLoop } from "../pose-test/pose-loop";
+import { GAME_DURATION } from "./config";
 import { TargetShotGame, type TargetShotGameState } from "./game";
 import { RightHandGunController } from "./hand-gun";
 
@@ -66,7 +68,7 @@ export function mountTargetShot(): void {
     elements.error.hidden = false;
   };
 
-  const updateControls = (_state?: TargetShotGameState): void => {
+  const updateControls = (stateChange?: TargetShotGameState): void => {
     const state = game?.state ?? "IDLE";
     const ready = isGameReady();
     elements.root.dataset.gameState = state.toLowerCase();
@@ -81,6 +83,24 @@ export function mountTargetShot(): void {
     if (state === "FINISHED" || state === "IDLE") {
       const score = state === "FINISHED" ? Number(elements.finalScore.textContent) : 0;
       renderStarRating(elements.rating, score, [5, 12, 20]);
+    }
+    if (stateChange === "FINISHED") {
+      const score = Number(elements.finalScore.textContent);
+      void saveCompletedGame(elements.root, {
+        gameId: "target-shot",
+        score,
+        durationSeconds: Math.round(GAME_DURATION / 1_000),
+      })
+        .then(() => {
+          if (game.state === "FINISHED") {
+            elements.gameStatus.textContent = "Finished — record saved";
+          }
+        })
+        .catch(() => {
+          if (game.state === "FINISHED") {
+            elements.gameStatus.textContent = "Finished — record not saved";
+          }
+        });
     }
   };
 

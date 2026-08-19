@@ -1,6 +1,7 @@
 import type { PoseLandmarker } from "@mediapipe/tasks-vision";
 
 import { renderStarRating } from "../game-shell/rating";
+import { saveCompletedGame } from "../game-shell/records";
 import { CameraController } from "../pose-test/camera";
 import {
   closePoseLandmarker,
@@ -8,6 +9,7 @@ import {
 } from "../pose-test/pose-landmarker";
 import { PoseDetectionLoop } from "../pose-test/pose-loop";
 import { PoseRenderer } from "../pose-test/pose-renderer";
+import { GAME_DURATION } from "./config";
 import { EasyFruitCatchGame, type GameState } from "./game";
 import { WristBasketController } from "./wrist-baskets";
 
@@ -73,7 +75,7 @@ export function mountFruitCatch(): void {
     elements.error.hidden = false;
   };
 
-  const updateControls = (_state?: GameState): void => {
+  const updateControls = (stateChange?: GameState): void => {
     const state = game?.state ?? "IDLE";
     const ready = isGameReady();
     elements.root.dataset.gameState = state.toLowerCase();
@@ -88,6 +90,24 @@ export function mountFruitCatch(): void {
     if (state === "FINISHED" || state === "IDLE") {
       const score = state === "FINISHED" ? Number(elements.finalScore.textContent) : 0;
       renderStarRating(elements.rating, score, [5, 12, 20]);
+    }
+    if (stateChange === "FINISHED") {
+      const score = Number(elements.finalScore.textContent);
+      void saveCompletedGame(elements.root, {
+        gameId: "fruit-catch",
+        score,
+        durationSeconds: Math.round(GAME_DURATION / 1_000),
+      })
+        .then(() => {
+          if (game.state === "FINISHED") {
+            elements.gameStatus.textContent = "Finished — record saved";
+          }
+        })
+        .catch(() => {
+          if (game.state === "FINISHED") {
+            elements.gameStatus.textContent = "Finished — record not saved";
+          }
+        });
     }
   };
 
