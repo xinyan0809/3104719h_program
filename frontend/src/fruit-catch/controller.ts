@@ -75,8 +75,23 @@ export function mountFruitCatch(): void {
     elements.error.hidden = false;
   };
 
+  const releasePoseSession = (): void => {
+    detectionLoop?.stop();
+    detectionLoop = null;
+    camera.stop(elements.video);
+    renderer.clear();
+    baskets.reset();
+    modelReady = false;
+  };
+
   const updateControls = (stateChange?: GameState): void => {
     const state = game?.state ?? "IDLE";
+    if (stateChange === "FINISHED") {
+      operationVersion += 1;
+      isStarting = false;
+      releasePoseSession();
+      setPoseStatus("Camera stopped", "idle");
+    }
     const ready = isGameReady();
     elements.root.dataset.gameState = state.toLowerCase();
     elements.startCameraButton.textContent = isStarting
@@ -85,7 +100,10 @@ export function mountFruitCatch(): void {
     elements.startCameraButton.disabled = isStarting || camera.isRunning;
     elements.stopCameraButton.disabled = !camera.isRunning;
     elements.startGameButton.disabled = !ready || state !== "IDLE";
-    elements.restartGameButton.disabled = !ready || state !== "FINISHED";
+    elements.restartGameButton.textContent = isStarting
+      ? "Starting..."
+      : "Play Again";
+    elements.restartGameButton.disabled = isStarting || state !== "FINISHED";
     elements.root.dataset.modelReady = String(ready);
     if (state === "FINISHED" || state === "IDLE") {
       const score = state === "FINISHED" ? Number(elements.finalScore.textContent) : 0;
@@ -128,12 +146,7 @@ export function mountFruitCatch(): void {
   );
 
   const releaseCameraAndPose = (): void => {
-    detectionLoop?.stop();
-    detectionLoop = null;
-    camera.stop(elements.video);
-    renderer.clear();
-    baskets.reset();
-    modelReady = false;
+    releasePoseSession();
     game.cancel();
   };
 
@@ -157,7 +170,7 @@ export function mountFruitCatch(): void {
     updateControls();
   };
 
-  elements.startCameraButton.addEventListener("click", async () => {
+  const startCameraAndGame = async (): Promise<void> => {
     if (isStarting || camera.isRunning) {
       return;
     }
@@ -217,11 +230,12 @@ export function mountFruitCatch(): void {
       }
       updateControls();
     }
-  });
+  };
 
+  elements.startCameraButton.addEventListener("click", startCameraAndGame);
   elements.stopCameraButton.addEventListener("click", stopCamera);
   elements.startGameButton.addEventListener("click", beginGame);
-  elements.restartGameButton.addEventListener("click", beginGame);
+  elements.restartGameButton.addEventListener("click", startCameraAndGame);
   window.addEventListener("pagehide", () => {
     operationVersion += 1;
     releaseCameraAndPose();

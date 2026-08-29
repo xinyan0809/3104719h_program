@@ -56,6 +56,8 @@ export class CameraController {
     this.stream = null;
     video.pause();
     video.srcObject = null;
+    video.removeAttribute("src");
+    video.load();
   }
 }
 
