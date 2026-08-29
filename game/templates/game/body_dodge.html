@@ -60,7 +60,10 @@
           <h2 id="dodge-final-score-title">Great game!</h2>
           <p class="game-shell__final-score">Final score <strong id="dodge-final-score">0</strong></p>
           <div id="dodge-star-rating" class="game-shell__rating" role="img" aria-label="0 out of 3 stars">☆☆☆</div>
-          <button id="dodge-restart-game" class="button button--primary" type="button" disabled>Play Again</button>
+          <div class="game-shell__result-actions">
+            <button id="dodge-restart-game" class="button button--primary" type="button" disabled>Play Again</button>
+            <a class="button button--secondary" href="{% url 'game_selection' %}">Exit</a>
+          </div>
         </div>
       </section>
     </div>

@@ -172,6 +172,18 @@
   margin-top: 1.4rem;
 }
 
+.game-shell__result-actions {
+  margin-top: 1.4rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.game-shell__result-actions .button {
+  margin-top: 0;
+}
+
 .game-shell__intro-status {
   min-height: 1.3rem;
   margin-top: 0.75rem !important;
