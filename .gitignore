@@ -2,9 +2,10 @@
 __pycache__/
 *.py[cod]
 db.sqlite3
-.env
+.env*
 .vscode/
 .idea/
+.vercel/
 node_modules/
 game/static/game/vite/
 media/

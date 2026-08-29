@@ -34,7 +34,8 @@ def env_bool(name, default=False):
 SECRET_KEY = "django-insecure-6)uw#=)sr$0g1wq4oe!iil2j7gq$p9v=!ex=6j=m136_4!js2f"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env_bool('DJANGO_DEBUG', default=not bool(os.getenv('RENDER')))
+IS_DEPLOYED = bool(os.getenv('RENDER') or os.getenv('VERCEL'))
+DEBUG = env_bool('DJANGO_DEBUG', default=not IS_DEPLOYED)
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', SECRET_KEY)
 
 ALLOWED_HOSTS = ["127.0.0.1", "localhost", "testserver"]
@@ -50,16 +51,22 @@ ALLOWED_HOSTS.extend(
 )
 
 RENDER_EXTERNAL_HOSTNAME = os.getenv('RENDER_EXTERNAL_HOSTNAME')
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+DEPLOYMENT_HOSTS = [
+    'poseplay.vercel.app',
+    RENDER_EXTERNAL_HOSTNAME,
+    os.getenv('VERCEL_URL'),
+    os.getenv('VERCEL_PROJECT_PRODUCTION_URL'),
+]
+ALLOWED_HOSTS.extend(host for host in DEPLOYMENT_HOSTS if host)
 
 CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',')
     if origin.strip()
 ]
-if RENDER_EXTERNAL_HOSTNAME:
-    CSRF_TRUSTED_ORIGINS.append(f'https://{RENDER_EXTERNAL_HOSTNAME}')
+CSRF_TRUSTED_ORIGINS.extend(
+    f'https://{host}' for host in DEPLOYMENT_HOSTS if host
+)
 
 
 # Application definition
