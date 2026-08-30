@@ -14,7 +14,7 @@
         <a
           class="primary-nav__link"
           href="{% url 'game_selection' %}"
-          {% if request.resolver_match.url_name == "game_selection" or request.resolver_match.url_name == "fruit_catch" %}aria-current="page"{% endif %}
+          {% if request.resolver_match.url_name == "game_selection" or request.resolver_match.url_name == "fruit_catch" or request.resolver_match.url_name == "target_shot" or request.resolver_match.url_name == "body_dodge" %}aria-current="page"{% endif %}
         >
           Play Game
         </a>

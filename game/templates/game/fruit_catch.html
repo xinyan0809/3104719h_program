@@ -25,10 +25,7 @@
       <div id="left-basket" class="fruit-basket fruit-basket--left" aria-label="Left wrist basket" hidden></div>
       <div id="right-basket" class="fruit-basket fruit-basket--right" aria-label="Right wrist basket" hidden></div>
 
-      <dl class="game-shell__hud" aria-label="Game score and time">
-        <div><dt>Score</dt><dd id="game-score">0</dd></div>
-        <div><dt>Time</dt><dd><span id="game-time">60</span>s</dd></div>
-      </dl>
+      {% include "game/partials/game_hud.html" with score_id="game-score" time_id="game-time" only %}
 
       <button id="stop-camera" class="button game-shell__stop" type="button" disabled>
         Stop
@@ -39,31 +36,12 @@
         <span>Game: <strong id="game-status" data-state="idle">Idle</strong></span>
       </div>
 
-      <div class="game-shell__intro">
-        <div class="game-shell__intro-card">
-          <h1 id="page-title">Fruit Catch</h1>
-          <p>Move both wrists to guide the baskets. Catch as much falling fruit as you can before time runs out.</p>
-          <button id="start-camera" class="button button--primary" type="button" disabled>
-            Start Game
-          </button>
-          <p id="game-error" class="game-shell__error" role="alert" hidden></p>
-        </div>
-      </div>
+      {% include "game/partials/game_intro.html" with game_title="Fruit Catch" instructions="Move both wrists to guide the baskets. Catch as much falling fruit as you can before time runs out." start_id="start-camera" error_id="game-error" only %}
 
       <button id="start-game" class="game-shell__internal-control" type="button" hidden>Start</button>
-      <div id="game-countdown" class="fruit-countdown" aria-live="assertive" hidden></div>
+      <div id="game-countdown" class="game-shell__countdown" aria-live="assertive" hidden></div>
 
-      <section id="game-finished" class="fruit-finished game-shell__result" aria-labelledby="final-score-title" hidden>
-        <div class="game-shell__result-card">
-          <h2 id="final-score-title">Great game!</h2>
-          <p class="game-shell__final-score">Final score <strong id="final-score">0</strong></p>
-          <div id="fruit-star-rating" class="game-shell__rating" role="img" aria-label="0 out of 3 stars">☆☆☆</div>
-          <div class="game-shell__result-actions">
-            <button id="restart-game" class="button button--primary" type="button" disabled>Play Again</button>
-            <a class="button button--secondary" href="{% url 'game_selection' %}">Exit</a>
-          </div>
-        </div>
-      </section>
+      {% include "game/partials/game_result.html" with panel_id="game-finished" heading_id="final-score-title" score_id="final-score" rating_id="fruit-star-rating" restart_id="restart-game" only %}
     </div>
 
     <p class="game-shell__privacy">Camera frames and pose data stay in this browser. Only the game name, final score and play time are saved to your account.</p>

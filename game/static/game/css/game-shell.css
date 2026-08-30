@@ -41,14 +41,30 @@
 }
 
 .game-shell__stage {
+  --game-stage-aspect-ratio: 16 / 9;
+  position: relative;
   width: auto;
   height: 100%;
   max-width: 100%;
   max-height: 100%;
   margin: 0;
+  overflow: hidden;
+  aspect-ratio: var(--game-stage-aspect-ratio);
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: var(--radius-large);
+  background: #101828;
   box-shadow: 0 1.5rem 4rem -1.75rem rgba(15, 23, 42, 0.72);
+  isolation: isolate;
+}
+
+.game-shell__stage video {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform: scaleX(-1);
 }
 
 .game-shell__hud {
@@ -184,12 +200,6 @@
   margin-top: 0;
 }
 
-.game-shell__intro-status {
-  min-height: 1.3rem;
-  margin-top: 0.75rem !important;
-  font-size: var(--font-size-xs);
-}
-
 .game-shell__error {
   margin-top: 0.55rem !important;
   color: #fecaca !important;
@@ -227,6 +237,23 @@
   margin-right: 0.65rem;
   color: rgba(255, 255, 255, 0.35);
   content: "\2022";
+}
+
+.game-shell__countdown {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  background: rgba(16, 24, 40, 0.42);
+  font-size: clamp(4rem, 14vw, 8rem);
+  font-weight: 850;
+  text-shadow: 0 0.2rem 1rem rgba(0, 0, 0, 0.55);
+}
+
+.game-shell__countdown[hidden] {
+  display: none;
 }
 
 .game-shell__result[hidden] {

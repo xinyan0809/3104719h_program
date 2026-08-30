@@ -1,14 +1,7 @@
-import type { PoseLandmarker } from "@mediapipe/tasks-vision";
-
 import { renderStarRating } from "../game-shell/rating";
 import { saveCompletedGame } from "../game-shell/records";
-import { CameraController } from "../pose-test/camera";
+import { PoseGameSession } from "../game-shell/pose-session";
 import { HorizontalMovementTracker } from "../pose-test/movement";
-import {
-  closePoseLandmarker,
-  loadPoseLandmarker,
-} from "../pose-test/pose-landmarker";
-import { PoseDetectionLoop } from "../pose-test/pose-loop";
 import { GAME_DURATION } from "./config";
 import { BodyDodgeGame, type BodyDodgeGameState } from "./game";
 import { LanePlayerController } from "./lane-player";
@@ -41,17 +34,9 @@ export function mountBodyDodge(): void {
     return;
   }
 
-  const camera = new CameraController();
   const movementTracker = new HorizontalMovementTracker();
   const player = new LanePlayerController(elements.stage, elements.player);
-  let landmarker: PoseLandmarker | null = null;
-  let detectionLoop: PoseDetectionLoop | null = null;
-  let isStarting = false;
-  let modelReady = false;
-  let operationVersion = 0;
   let game: BodyDodgeGame;
-
-  const isGameReady = (): boolean => modelReady && camera.isRunning;
 
   const setPoseStatus = (message: string, state: string): void => {
     elements.poseStatus.textContent = message;
@@ -71,36 +56,63 @@ export function mountBodyDodge(): void {
     elements.error.hidden = false;
   };
 
-  const releasePoseSession = (): void => {
-    detectionLoop?.stop();
-    detectionLoop = null;
-    camera.stop(elements.video);
-    movementTracker.reset();
-    player.reset();
-    game.updateMovement(null);
-    modelReady = false;
-  };
+  const poseSession = new PoseGameSession({
+    video: elements.video,
+    onVideoReady: () => {
+      player.syncStageToVideo(elements.video);
+      updateControls();
+    },
+    onResult: (result) => {
+      const landmarks = result.landmarks[0];
+      const movement = movementTracker.update(
+        landmarks,
+        performance.now(),
+      );
+      game.updateMovement(movement);
+
+      if (!landmarks) {
+        setPoseStatus("No pose detected", "ready");
+      } else if (movement) {
+        setPoseStatus("Body position detected", "detected");
+      } else {
+        setPoseStatus("Body position unavailable", "ready");
+      }
+    },
+    onReset: () => {
+      movementTracker.reset();
+      player.reset();
+      game.updateMovement(null);
+    },
+    onRuntimeError: (error) => {
+      game.cancel();
+      showError(error);
+      setPoseStatus("Camera or model error", "error");
+      updateControls();
+    },
+  });
+
+  const isGameReady = (): boolean => poseSession.isReady;
 
   const updateControls = (stateChange?: BodyDodgeGameState): void => {
     const state = game?.state ?? "IDLE";
     if (stateChange === "FINISHED") {
-      operationVersion += 1;
-      isStarting = false;
-      releasePoseSession();
+      poseSession.stop();
       setPoseStatus("Camera stopped", "idle");
     }
     const ready = isGameReady();
     elements.root.dataset.gameState = state.toLowerCase();
-    elements.startCameraButton.textContent = isStarting
+    elements.startCameraButton.textContent = poseSession.isStarting
       ? "Starting..."
       : "Start Game";
-    elements.startCameraButton.disabled = isStarting || camera.isRunning;
-    elements.stopCameraButton.disabled = !camera.isRunning;
+    elements.startCameraButton.disabled =
+      poseSession.isStarting || poseSession.isRunning;
+    elements.stopCameraButton.disabled = !poseSession.isRunning;
     elements.startGameButton.disabled = !ready || state !== "IDLE";
-    elements.restartGameButton.textContent = isStarting
+    elements.restartGameButton.textContent = poseSession.isStarting
       ? "Starting..."
       : "Play Again";
-    elements.restartGameButton.disabled = isStarting || state !== "FINISHED";
+    elements.restartGameButton.disabled =
+      poseSession.isStarting || state !== "FINISHED";
     elements.root.dataset.modelReady = String(ready);
     if (state === "FINISHED" || state === "IDLE") {
       const score = state === "FINISHED" ? Number(elements.finalScore.textContent) : 0;
@@ -144,13 +156,11 @@ export function mountBodyDodge(): void {
   );
 
   const releaseCameraAndPose = (): void => {
-    releasePoseSession();
+    poseSession.stop();
     game.cancel();
   };
 
   const stopCamera = (): void => {
-    operationVersion += 1;
-    isStarting = false;
     releaseCameraAndPose();
     clearError();
     setPoseStatus("Camera not started", "idle");
@@ -171,71 +181,28 @@ export function mountBodyDodge(): void {
   };
 
   const startCameraAndGame = async (): Promise<void> => {
-    if (isStarting || camera.isRunning) {
+    if (poseSession.isStarting || poseSession.isRunning) {
       return;
     }
 
-    const currentOperation = ++operationVersion;
-    isStarting = true;
     clearError();
     setPoseStatus("Loading pose model", "loading");
+    const startPromise = poseSession.start();
     updateControls();
 
     try {
-      await camera.start(elements.video);
-      if (currentOperation !== operationVersion || !camera.isRunning) {
+      const started = await startPromise;
+      if (!started) {
         return;
       }
-      player.syncStageToVideo(elements.video);
-      updateControls();
-
-      const loadedLandmarker = await loadPoseLandmarker();
-      if (currentOperation !== operationVersion || !camera.isRunning) {
-        return;
-      }
-      landmarker = loadedLandmarker;
-      modelReady = true;
-
-      detectionLoop = new PoseDetectionLoop(
-        elements.video,
-        landmarker,
-        (result) => {
-          const landmarks = result.landmarks[0];
-          const movement = movementTracker.update(
-            landmarks,
-            performance.now(),
-          );
-          game.updateMovement(movement);
-
-          if (!landmarks) {
-            setPoseStatus("No pose detected", "ready");
-          } else if (movement) {
-            setPoseStatus("Body position detected", "detected");
-          } else {
-            setPoseStatus("Body position unavailable", "ready");
-          }
-        },
-        (error) => {
-          releaseCameraAndPose();
-          showError(error);
-          setPoseStatus("Camera or model error", "error");
-          updateControls();
-        },
-      );
-      detectionLoop.start();
       setPoseStatus("No pose detected", "ready");
       elements.gameStatus.textContent = "Ready to start";
       beginGame();
     } catch (error) {
-      if (currentOperation === operationVersion) {
-        releaseCameraAndPose();
-        showError(error);
-        setPoseStatus("Camera or model error", "error");
-      }
+      game.cancel();
+      showError(error);
+      setPoseStatus("Camera or model error", "error");
     } finally {
-      if (currentOperation === operationVersion) {
-        isStarting = false;
-      }
       updateControls();
     }
   };
@@ -245,10 +212,8 @@ export function mountBodyDodge(): void {
   elements.startGameButton.addEventListener("click", beginGame);
   elements.restartGameButton.addEventListener("click", startCameraAndGame);
   window.addEventListener("pagehide", () => {
-    operationVersion += 1;
-    releaseCameraAndPose();
-    closePoseLandmarker(landmarker);
-    landmarker = null;
+    game.cancel();
+    poseSession.dispose();
   });
 
   elements.root.dataset.moduleReady = "true";

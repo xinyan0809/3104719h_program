@@ -1,13 +1,6 @@
-import type { PoseLandmarker } from "@mediapipe/tasks-vision";
-
 import { renderStarRating } from "../game-shell/rating";
 import { saveCompletedGame } from "../game-shell/records";
-import { CameraController } from "../pose-test/camera";
-import {
-  closePoseLandmarker,
-  loadPoseLandmarker,
-} from "../pose-test/pose-landmarker";
-import { PoseDetectionLoop } from "../pose-test/pose-loop";
+import { PoseGameSession } from "../game-shell/pose-session";
 import { PoseRenderer } from "../pose-test/pose-renderer";
 import { GAME_DURATION } from "./config";
 import { EasyFruitCatchGame, type GameState } from "./game";
@@ -42,7 +35,6 @@ export function mountFruitCatch(): void {
     return;
   }
 
-  const camera = new CameraController();
   const renderer = new PoseRenderer(elements.canvas);
   const baskets = new WristBasketController(
     elements.stage,
@@ -50,14 +42,7 @@ export function mountFruitCatch(): void {
     elements.rightBasket,
   );
 
-  let landmarker: PoseLandmarker | null = null;
-  let detectionLoop: PoseDetectionLoop | null = null;
-  let isStarting = false;
-  let modelReady = false;
-  let operationVersion = 0;
   let game: EasyFruitCatchGame;
-
-  const isGameReady = (): boolean => modelReady && camera.isRunning;
 
   const setPoseStatus = (message: string, state: string): void => {
     elements.poseStatus.textContent = message;
@@ -75,35 +60,54 @@ export function mountFruitCatch(): void {
     elements.error.hidden = false;
   };
 
-  const releasePoseSession = (): void => {
-    detectionLoop?.stop();
-    detectionLoop = null;
-    camera.stop(elements.video);
-    renderer.clear();
-    baskets.reset();
-    modelReady = false;
-  };
+  const poseSession = new PoseGameSession({
+    video: elements.video,
+    onVideoReady: () => {
+      baskets.syncStageToVideo(elements.video);
+      updateControls();
+    },
+    onResult: (result) => {
+      const poseDetected = renderer.draw(result, elements.video);
+      baskets.update(result.landmarks[0]);
+      setPoseStatus(
+        poseDetected ? "Pose detected" : "No pose detected",
+        poseDetected ? "detected" : "ready",
+      );
+    },
+    onReset: () => {
+      renderer.clear();
+      baskets.reset();
+    },
+    onRuntimeError: (error) => {
+      game.cancel();
+      showError(error);
+      setPoseStatus("Camera or model error", "error");
+      updateControls();
+    },
+  });
+
+  const isGameReady = (): boolean => poseSession.isReady;
 
   const updateControls = (stateChange?: GameState): void => {
     const state = game?.state ?? "IDLE";
     if (stateChange === "FINISHED") {
-      operationVersion += 1;
-      isStarting = false;
-      releasePoseSession();
+      poseSession.stop();
       setPoseStatus("Camera stopped", "idle");
     }
     const ready = isGameReady();
     elements.root.dataset.gameState = state.toLowerCase();
-    elements.startCameraButton.textContent = isStarting
+    elements.startCameraButton.textContent = poseSession.isStarting
       ? "Starting..."
       : "Start Game";
-    elements.startCameraButton.disabled = isStarting || camera.isRunning;
-    elements.stopCameraButton.disabled = !camera.isRunning;
+    elements.startCameraButton.disabled =
+      poseSession.isStarting || poseSession.isRunning;
+    elements.stopCameraButton.disabled = !poseSession.isRunning;
     elements.startGameButton.disabled = !ready || state !== "IDLE";
-    elements.restartGameButton.textContent = isStarting
+    elements.restartGameButton.textContent = poseSession.isStarting
       ? "Starting..."
       : "Play Again";
-    elements.restartGameButton.disabled = isStarting || state !== "FINISHED";
+    elements.restartGameButton.disabled =
+      poseSession.isStarting || state !== "FINISHED";
     elements.root.dataset.modelReady = String(ready);
     if (state === "FINISHED" || state === "IDLE") {
       const score = state === "FINISHED" ? Number(elements.finalScore.textContent) : 0;
@@ -146,13 +150,11 @@ export function mountFruitCatch(): void {
   );
 
   const releaseCameraAndPose = (): void => {
-    releasePoseSession();
+    poseSession.stop();
     game.cancel();
   };
 
   const stopCamera = (): void => {
-    operationVersion += 1;
-    isStarting = false;
     releaseCameraAndPose();
     clearError();
     setPoseStatus("Camera not started", "idle");
@@ -171,63 +173,28 @@ export function mountFruitCatch(): void {
   };
 
   const startCameraAndGame = async (): Promise<void> => {
-    if (isStarting || camera.isRunning) {
+    if (poseSession.isStarting || poseSession.isRunning) {
       return;
     }
 
-    const currentOperation = ++operationVersion;
-    isStarting = true;
     clearError();
     setPoseStatus("Loading pose model", "loading");
+    const startPromise = poseSession.start();
     updateControls();
 
     try {
-      await camera.start(elements.video);
-      if (currentOperation !== operationVersion || !camera.isRunning) {
+      const started = await startPromise;
+      if (!started) {
         return;
       }
-      baskets.syncStageToVideo(elements.video);
-      updateControls();
-
-      const loadedLandmarker = await loadPoseLandmarker();
-      if (currentOperation !== operationVersion || !camera.isRunning) {
-        return;
-      }
-      landmarker = loadedLandmarker;
-      modelReady = true;
-
-      detectionLoop = new PoseDetectionLoop(
-        elements.video,
-        landmarker,
-        (result) => {
-          const poseDetected = renderer.draw(result, elements.video);
-          baskets.update(result.landmarks[0]);
-          setPoseStatus(
-            poseDetected ? "Pose detected" : "No pose detected",
-            poseDetected ? "detected" : "ready",
-          );
-        },
-        (error) => {
-          releaseCameraAndPose();
-          showError(error);
-          setPoseStatus("Camera or model error", "error");
-          updateControls();
-        },
-      );
-      detectionLoop.start();
       setPoseStatus("No pose detected", "ready");
       elements.gameStatus.textContent = "Ready to start";
       beginGame();
     } catch (error) {
-      if (currentOperation === operationVersion) {
-        releaseCameraAndPose();
-        showError(error);
-        setPoseStatus("Camera or model error", "error");
-      }
+      game.cancel();
+      showError(error);
+      setPoseStatus("Camera or model error", "error");
     } finally {
-      if (currentOperation === operationVersion) {
-        isStarting = false;
-      }
       updateControls();
     }
   };
@@ -237,10 +204,8 @@ export function mountFruitCatch(): void {
   elements.startGameButton.addEventListener("click", beginGame);
   elements.restartGameButton.addEventListener("click", startCameraAndGame);
   window.addEventListener("pagehide", () => {
-    operationVersion += 1;
-    releaseCameraAndPose();
-    closePoseLandmarker(landmarker);
-    landmarker = null;
+    game.cancel();
+    poseSession.dispose();
   });
 
   elements.root.dataset.moduleReady = "true";

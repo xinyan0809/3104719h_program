@@ -26,10 +26,7 @@
       <div id="dodge-obstacle-layer" class="body-dodge__obstacle-layer" aria-hidden="true"></div>
       <div id="dodge-player" class="body-dodge__player" aria-label="Player">&#x1F3C3;</div>
 
-      <dl class="game-shell__hud" aria-label="Game score and time">
-        <div><dt>Score</dt><dd id="dodge-game-score">0</dd></div>
-        <div><dt>Time</dt><dd><span id="dodge-game-time">60</span>s</dd></div>
-      </dl>
+      {% include "game/partials/game_hud.html" with score_id="dodge-game-score" time_id="dodge-game-time" only %}
 
       <button id="dodge-stop-camera" class="button game-shell__stop" type="button" disabled>
         Stop
@@ -41,31 +38,12 @@
         <span class="visually-hidden">Game: <strong id="dodge-game-status" data-state="idle">Idle</strong></span>
       </div>
 
-      <div class="game-shell__intro">
-        <div class="game-shell__intro-card">
-          <h1 id="page-title">Body Dodge</h1>
-          <p>Move your whole body left, centre or right. Switch lanes to avoid the falling obstacles.</p>
-          <button id="dodge-start-camera" class="button button--primary" type="button" disabled>
-            Start Game
-          </button>
-          <p id="dodge-game-error" class="game-shell__error" role="alert" hidden></p>
-        </div>
-      </div>
+      {% include "game/partials/game_intro.html" with game_title="Body Dodge" instructions="Move your whole body left, centre or right. Switch lanes to avoid the falling obstacles." start_id="dodge-start-camera" error_id="dodge-game-error" only %}
 
       <button id="dodge-start-game" class="game-shell__internal-control" type="button" hidden>Start</button>
-      <div id="dodge-countdown" class="body-dodge__countdown" aria-live="assertive" hidden></div>
+      <div id="dodge-countdown" class="game-shell__countdown" aria-live="assertive" hidden></div>
 
-      <section id="dodge-game-finished" class="body-dodge__finished game-shell__result" aria-labelledby="dodge-final-score-title" hidden>
-        <div class="game-shell__result-card">
-          <h2 id="dodge-final-score-title">Great game!</h2>
-          <p class="game-shell__final-score">Final score <strong id="dodge-final-score">0</strong></p>
-          <div id="dodge-star-rating" class="game-shell__rating" role="img" aria-label="0 out of 3 stars">☆☆☆</div>
-          <div class="game-shell__result-actions">
-            <button id="dodge-restart-game" class="button button--primary" type="button" disabled>Play Again</button>
-            <a class="button button--secondary" href="{% url 'game_selection' %}">Exit</a>
-          </div>
-        </div>
-      </section>
+      {% include "game/partials/game_result.html" with panel_id="dodge-game-finished" heading_id="dodge-final-score-title" score_id="dodge-final-score" rating_id="dodge-star-rating" restart_id="dodge-restart-game" only %}
     </div>
 
     <p class="game-shell__privacy">Camera frames and pose data stay in this browser. Only the game name, final score and play time are saved to your account.</p>

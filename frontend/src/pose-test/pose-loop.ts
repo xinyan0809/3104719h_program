@@ -6,6 +6,14 @@ import {
 type ResultHandler = (result: PoseLandmarkerResult) => void;
 type ErrorHandler = (error: Error) => void;
 
+export interface PoseFrameTiming {
+  frameStartedAt: number;
+  inferenceMilliseconds: number;
+  movementToRenderMilliseconds: number;
+}
+
+type TimingHandler = (timing: PoseFrameTiming) => void;
+
 export class PoseDetectionLoop {
   private animationFrameId: number | null = null;
   private lastVideoTime = -1;
@@ -15,6 +23,7 @@ export class PoseDetectionLoop {
     private readonly landmarker: PoseLandmarker,
     private readonly onResult: ResultHandler,
     private readonly onError: ErrorHandler,
+    private readonly onTiming?: TimingHandler,
   ) {}
 
   start(): void {
@@ -44,12 +53,25 @@ export class PoseDetectionLoop {
         this.video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA &&
         this.video.currentTime !== this.lastVideoTime
       ) {
-        const result = this.landmarker.detectForVideo(
-          this.video,
-          performance.now(),
-        );
+        const frameStartedAt = performance.now();
+        const result = this.landmarker.detectForVideo(this.video, frameStartedAt);
+        const inferenceCompletedAt = performance.now();
         this.lastVideoTime = this.video.currentTime;
         this.onResult(result);
+
+        if (this.onTiming) {
+          requestAnimationFrame(() => {
+            if (this.animationFrameId === null) {
+              return;
+            }
+            const renderedAt = performance.now();
+            this.onTiming?.({
+              frameStartedAt,
+              inferenceMilliseconds: inferenceCompletedAt - frameStartedAt,
+              movementToRenderMilliseconds: renderedAt - frameStartedAt,
+            });
+          });
+        }
       }
 
       this.animationFrameId = requestAnimationFrame(this.detectFrame);

@@ -1,4 +1,5 @@
 import type { MovementState } from "../pose-test/movement";
+import { syncStageAspectRatio } from "../game-shell/coordinates";
 import {
   LANE_COUNT,
   PLAYER_BOTTOM_OFFSET,
@@ -33,12 +34,7 @@ export class LanePlayerController {
   }
 
   syncStageToVideo(video: HTMLVideoElement): void {
-    if (video.videoWidth > 0 && video.videoHeight > 0) {
-      this.stage.style.setProperty(
-        "--dodge-stage-aspect-ratio",
-        `${video.videoWidth} / ${video.videoHeight}`,
-      );
-    }
+    syncStageAspectRatio(this.stage, video);
   }
 
   update(movement: MovementState | null): void {

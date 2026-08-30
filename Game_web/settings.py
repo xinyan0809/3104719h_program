@@ -34,7 +34,7 @@ def env_bool(name, default=False):
 SECRET_KEY = "django-insecure-6)uw#=)sr$0g1wq4oe!iil2j7gq$p9v=!ex=6j=m136_4!js2f"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-IS_DEPLOYED = bool(os.getenv('RENDER') or os.getenv('VERCEL'))
+IS_DEPLOYED = bool(os.getenv('VERCEL'))
 DEBUG = env_bool('DJANGO_DEBUG', default=not IS_DEPLOYED)
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', SECRET_KEY)
 
@@ -50,10 +50,8 @@ ALLOWED_HOSTS.extend(
     if host.strip()
 )
 
-RENDER_EXTERNAL_HOSTNAME = os.getenv('RENDER_EXTERNAL_HOSTNAME')
 DEPLOYMENT_HOSTS = [
     'poseplay.vercel.app',
-    RENDER_EXTERNAL_HOSTNAME,
     os.getenv('VERCEL_URL'),
     os.getenv('VERCEL_PROJECT_PRODUCTION_URL'),
 ]

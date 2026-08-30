@@ -1,76 +1,3 @@
-.body-dodge {
-  --dodge-stage-aspect-ratio: 16 / 9;
-}
-
-.body-dodge__heading {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-5);
-}
-
-.body-dodge__heading h1,
-.body-dodge__heading p {
-  margin-top: 0;
-}
-
-.body-dodge__eyebrow {
-  margin-bottom: var(--space-2);
-  color: var(--color-primary);
-  font-size: 0.8125rem;
-  font-weight: 750;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.body-dodge__hud {
-  margin: 0;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(5rem, 1fr));
-  gap: var(--space-3);
-}
-
-.body-dodge__hud div {
-  min-width: 6rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-small);
-  padding: var(--space-3);
-  background: var(--color-surface-subtle);
-  text-align: center;
-}
-
-.body-dodge__hud dt {
-  color: var(--color-muted);
-  font-size: 0.8125rem;
-  font-weight: 650;
-}
-
-.body-dodge__hud dd {
-  margin: var(--space-1) 0 0;
-  font-size: 1.5rem;
-  font-weight: 800;
-}
-
-.body-dodge__controls {
-  margin-top: var(--space-5);
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-}
-
-.body-dodge__status {
-  min-height: 7rem;
-  margin-top: var(--space-5);
-}
-
-.body-dodge__status p {
-  margin: 0;
-}
-
-.body-dodge__status p + p {
-  margin-top: var(--space-2);
-}
-
 #dodge-movement-state[data-movement="left"],
 #dodge-movement-state[data-movement="right"] {
   color: var(--color-info);
@@ -80,30 +7,12 @@
   color: var(--color-success);
 }
 
-.body-dodge__stage {
-  position: relative;
-  width: 100%;
-  margin-top: var(--space-4);
-  overflow: hidden;
-  aspect-ratio: var(--dodge-stage-aspect-ratio);
-  border-radius: var(--radius-small);
-  background: #101828;
-  isolation: isolate;
-}
-
-.body-dodge__stage video,
 .body-dodge__lanes,
 .body-dodge__obstacle-layer {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-}
-
-.body-dodge__stage video {
-  z-index: 0;
-  object-fit: contain;
-  transform: scaleX(-1);
 }
 
 .body-dodge__lanes {
@@ -169,50 +78,4 @@
   line-height: 1;
   user-select: none;
   will-change: transform;
-}
-
-.body-dodge__countdown {
-  position: absolute;
-  z-index: 5;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  color: #ffffff;
-  background: rgba(16, 24, 40, 0.42);
-  font-size: clamp(4rem, 14vw, 8rem);
-  font-weight: 850;
-  text-shadow: 0 0.2rem 1rem rgba(0, 0, 0, 0.55);
-}
-
-.body-dodge__countdown[hidden],
-.body-dodge__finished[hidden] {
-  display: none;
-}
-
-.body-dodge__finished {
-  margin-top: var(--space-5);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-small);
-  padding: var(--space-5);
-  background: var(--color-success-background);
-  text-align: center;
-}
-
-.body-dodge__finished h2,
-.body-dodge__finished p {
-  margin-top: 0;
-}
-
-@media (max-width: 40rem) {
-  .body-dodge__heading {
-    flex-direction: column;
-  }
-
-  .body-dodge__hud {
-    width: 100%;
-  }
-
-  .body-dodge__controls .button {
-    flex: 1 1 9rem;
-  }
 }

@@ -1,0 +1,11 @@
+<section id="{{ panel_id }}" class="game-shell__result" aria-labelledby="{{ heading_id }}" hidden>
+  <div class="game-shell__result-card">
+    <h2 id="{{ heading_id }}">Great game!</h2>
+    <p class="game-shell__final-score">Final score <strong id="{{ score_id }}">0</strong></p>
+    <div id="{{ rating_id }}" class="game-shell__rating" role="img" aria-label="0 out of 3 stars">☆☆☆</div>
+    <div class="game-shell__result-actions">
+      <button id="{{ restart_id }}" class="button button--primary" type="button" disabled>Play Again</button>
+      <a class="button button--secondary" href="{% url 'game_selection' %}">Exit</a>
+    </div>
+  </div>
+</section>

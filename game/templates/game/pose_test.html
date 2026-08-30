@@ -41,6 +41,22 @@
       <p id="camera-error" class="pose-error" role="alert" hidden></p>
     </div>
 
+    <section id="pose-performance" class="pose-performance" aria-labelledby="pose-performance-title" hidden>
+      <h2 id="pose-performance-title">Pose performance measurement</h2>
+      <p>
+        This mode measures one readiness result and a defined sample of 300
+        processed video frames. Timing results remain in this browser.
+      </p>
+      <p id="pose-performance-status" aria-live="polite"></p>
+      <pre id="pose-performance-output"></pre>
+      <div class="pose-performance__actions">
+        <button id="copy-pose-performance" class="button button--secondary button--small" type="button" disabled>
+          Copy results
+        </button>
+        <span id="pose-performance-copy-status" aria-live="polite"></span>
+      </div>
+    </section>
+
     <div class="pose-stage" aria-label="Live camera preview">
       <video id="camera-preview" autoplay muted playsinline></video>
       <canvas id="pose-overlay" aria-hidden="true"></canvas>

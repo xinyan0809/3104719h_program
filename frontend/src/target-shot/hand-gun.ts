@@ -1,6 +1,12 @@
 import type { NormalizedLandmark } from "@mediapipe/tasks-vision";
 
-import { normalizedToDisplayedStage } from "../fruit-catch/wrist-baskets";
+import {
+  clamp,
+  normalizedToDisplayedStage,
+  smoothPoint,
+  type StagePoint,
+  syncStageAspectRatio,
+} from "../game-shell/coordinates";
 import {
   GUN_SIZE,
   HAND_VISIBILITY_THRESHOLD,
@@ -10,11 +16,6 @@ import {
 const RIGHT_WRIST = 16;
 const RIGHT_PINKY = 18;
 const RIGHT_INDEX = 20;
-
-export interface StagePoint {
-  x: number;
-  y: number;
-}
 
 export class RightHandGunController {
   private position: StagePoint | null = null;
@@ -28,12 +29,7 @@ export class RightHandGunController {
   }
 
   syncStageToVideo(video: HTMLVideoElement): void {
-    if (video.videoWidth > 0 && video.videoHeight > 0) {
-      this.stage.style.setProperty(
-        "--target-stage-aspect-ratio",
-        `${video.videoWidth} / ${video.videoHeight}`,
-      );
-    }
+    syncStageAspectRatio(this.stage, video);
   }
 
   update(landmarks: NormalizedLandmark[] | undefined): boolean {
@@ -74,7 +70,7 @@ export class RightHandGunController {
 
     // Tracking that returns starts at the new hand location, not stale history.
     this.position = this.position
-      ? smoothPoint(this.position, target)
+      ? smoothPoint(this.position, target, SMOOTHING_FACTOR)
       : target;
     this.gun.style.left = `${this.position.x}px`;
     this.gun.style.top = `${this.position.y}px`;
@@ -101,15 +97,4 @@ function isReliableHandLandmark(
       Number.isFinite(landmark.y) &&
       (landmark.visibility ?? 0) >= HAND_VISIBILITY_THRESHOLD,
   );
-}
-
-function smoothPoint(previous: StagePoint, target: StagePoint): StagePoint {
-  return {
-    x: previous.x + SMOOTHING_FACTOR * (target.x - previous.x),
-    y: previous.y + SMOOTHING_FACTOR * (target.y - previous.y),
-  };
-}
-
-function clamp(value: number, minimum: number, maximum: number): number {
-  return Math.min(Math.max(value, minimum), maximum);
 }

@@ -14,7 +14,8 @@ import {
   TARGET_SIZE,
   TARGET_SPAWN_INTERVAL,
 } from "./config";
-import type { RightHandGunController, StagePoint } from "./hand-gun";
+import type { StagePoint } from "../game-shell/coordinates";
+import type { RightHandGunController } from "./hand-gun";
 
 export type TargetShotGameState =
   | "IDLE"

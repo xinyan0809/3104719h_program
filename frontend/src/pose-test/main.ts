@@ -7,6 +7,7 @@ import {
   closePoseLandmarker,
   loadPoseLandmarker,
 } from "./pose-landmarker";
+import { createPosePerformanceMonitor } from "./performance-monitor";
 import { PoseDetectionLoop } from "./pose-loop";
 import { PoseRenderer } from "./pose-renderer";
 import type { PoseLandmarker } from "@mediapipe/tasks-vision";
@@ -17,6 +18,7 @@ if (elements) {
   const camera = new CameraController();
   const renderer = new PoseRenderer(elements.canvas);
   const movementTracker = new HorizontalMovementTracker();
+  const performanceMonitor = createPosePerformanceMonitor();
   let landmarker: PoseLandmarker | null = null;
   let detectionLoop: PoseDetectionLoop | null = null;
   let isStarting = false;
@@ -60,6 +62,7 @@ if (elements) {
   const stopPrototype = (): void => {
     operationVersion += 1;
     isStarting = false;
+    performanceMonitor?.stopRun();
     releaseCameraAndLoop();
     clearError();
     setStatus("Camera not started", "idle");
@@ -71,6 +74,7 @@ if (elements) {
       return;
     }
 
+    performanceMonitor?.startRun(performance.now());
     const currentOperation = ++operationVersion;
     isStarting = true;
     clearError();
@@ -103,12 +107,19 @@ if (elements) {
             poseDetected ? "Pose detected" : "No pose detected",
             poseDetected ? "detected" : "ready",
           );
+          if (poseDetected) {
+            performanceMonitor?.markFirstUsablePose(performance.now());
+          }
         },
         (error) => {
+          performanceMonitor?.stopRun();
           releaseCameraAndLoop();
           showError(error);
           setStatus("Camera or model error", "error");
           updateControls();
+        },
+        (timing) => {
+          performanceMonitor?.recordFrame(timing);
         },
       );
       detectionLoop.start();
@@ -116,6 +127,7 @@ if (elements) {
       setStatus("No pose detected", "ready");
     } catch (error) {
       if (currentOperation === operationVersion) {
+        performanceMonitor?.stopRun();
         releaseCameraAndLoop();
         showError(error);
         setStatus("Camera or model error", "error");
@@ -131,6 +143,7 @@ if (elements) {
   elements.stopButton.addEventListener("click", stopPrototype);
   window.addEventListener("pagehide", () => {
     operationVersion += 1;
+    performanceMonitor?.stopRun();
     releaseCameraAndLoop();
     closePoseLandmarker(landmarker);
     landmarker = null;

@@ -1,6 +1,13 @@
 import type { NormalizedLandmark } from "@mediapipe/tasks-vision";
 
 import {
+  clamp,
+  normalizedToDisplayedStage,
+  smoothPoint,
+  type StagePoint,
+  syncStageAspectRatio,
+} from "../game-shell/coordinates";
+import {
   BASKET_HEIGHT,
   BASKET_OFFSET_Y,
   BASKET_SIZE,
@@ -11,11 +18,6 @@ import {
 const LEFT_WRIST = 15;
 const RIGHT_WRIST = 16;
 
-interface Point {
-  x: number;
-  y: number;
-}
-
 export interface BasketCollisionBox {
   left: number;
   top: number;
@@ -25,7 +27,7 @@ export interface BasketCollisionBox {
 
 interface BasketState {
   element: HTMLElement;
-  position: Point | null;
+  position: StagePoint | null;
 }
 
 export class WristBasketController {
@@ -42,12 +44,7 @@ export class WristBasketController {
   }
 
   syncStageToVideo(video: HTMLVideoElement): void {
-    if (video.videoWidth > 0 && video.videoHeight > 0) {
-      this.stage.style.setProperty(
-        "--fruit-stage-aspect-ratio",
-        `${video.videoWidth} / ${video.videoHeight}`,
-      );
-    }
+    syncStageAspectRatio(this.stage, video);
   }
 
   update(landmarks: NormalizedLandmark[] | undefined): void {
@@ -75,7 +72,10 @@ export class WristBasketController {
 
   getCollisionBoxes(): BasketCollisionBox[] {
     return [this.left, this.right]
-      .filter((state): state is BasketState & { position: Point } => state.position !== null)
+      .filter(
+        (state): state is BasketState & { position: StagePoint } =>
+          state.position !== null,
+      )
       .map(({ position }) => ({
         left: position.x - BASKET_SIZE / 2,
         top: position.y - BASKET_HEIGHT / 2,
@@ -112,7 +112,9 @@ export class WristBasketController {
     };
 
     // A returning wrist starts at its current location instead of stale coordinates.
-    state.position = state.position ? smoothPoint(state.position, target) : target;
+    state.position = state.position
+      ? smoothPoint(state.position, target, SMOOTHING_FACTOR)
+      : target;
     state.element.style.left = `${state.position.x}px`;
     state.element.style.top = `${state.position.y}px`;
     state.element.hidden = false;
@@ -124,18 +126,6 @@ export class WristBasketController {
   }
 }
 
-// The anatomical wrist identity is unchanged; only camera X is mirrored for display.
-export function normalizedToDisplayedStage(
-  landmark: NormalizedLandmark,
-  stageWidth: number,
-  stageHeight: number,
-): Point {
-  return {
-    x: (1 - clamp(landmark.x, 0, 1)) * stageWidth,
-    y: clamp(landmark.y, 0, 1) * stageHeight,
-  };
-}
-
 function isReliableWrist(
   wrist: NormalizedLandmark | undefined,
 ): wrist is NormalizedLandmark {
@@ -145,15 +135,4 @@ function isReliableWrist(
       Number.isFinite(wrist.y) &&
       (wrist.visibility ?? 0) >= WRIST_VISIBILITY_THRESHOLD,
   );
-}
-
-function smoothPoint(previous: Point, target: Point): Point {
-  return {
-    x: previous.x + SMOOTHING_FACTOR * (target.x - previous.x),
-    y: previous.y + SMOOTHING_FACTOR * (target.y - previous.y),
-  };
-}
-
-function clamp(value: number, minimum: number, maximum: number): number {
-  return Math.min(Math.max(value, minimum), maximum);
 }
