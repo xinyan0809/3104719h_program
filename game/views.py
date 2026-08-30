@@ -35,11 +35,6 @@ def home(request):
 
 
 @login_required
-def pose_test(request):
-    return render(request, "game/pose_test.html")
-
-
-@login_required
 @ensure_csrf_cookie
 def fruit_catch(request):
     return render(request, "game/fruit_catch.html")

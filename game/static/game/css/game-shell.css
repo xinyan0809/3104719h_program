@@ -17,10 +17,6 @@
   place-items: center;
 }
 
-.page-game .site-footer {
-  display: none;
-}
-
 .page-game .message-list {
   position: fixed;
   z-index: 70;

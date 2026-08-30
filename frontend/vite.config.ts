@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import { fileURLToPath } from "node:url";
 
-const poseTestEntry = new URL("./src/pose-test/main.ts", import.meta.url);
 const fruitCatchEntry = new URL("./src/fruit-catch/main.ts", import.meta.url);
 const targetShotEntry = new URL("./src/target-shot/main.ts", import.meta.url);
 const bodyDodgeEntry = new URL("./src/body-dodge/main.ts", import.meta.url);
@@ -25,7 +24,6 @@ export default defineConfig({
         "body-dodge": fileURLToPath(bodyDodgeEntry),
         "cookie-notice": fileURLToPath(cookieNoticeEntry),
         "fruit-catch": fileURLToPath(fruitCatchEntry),
-        "pose-test": fileURLToPath(poseTestEntry),
         "target-shot": fileURLToPath(targetShotEntry),
       },
       output: {

@@ -12,6 +12,11 @@ class NavigationPageTests(TestCase):
             password="Testpass123",
         )
 
+    def test_pose_test_page_is_not_available(self):
+        response = self.client.get('/pose-test/')
+
+        self.assertEqual(response.status_code, 404)
+
     def test_anonymous_user_is_redirected_from_game_selection(self):
         response = self.client.get(reverse("game_selection"))
 
