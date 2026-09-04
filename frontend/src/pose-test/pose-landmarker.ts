@@ -1,9 +1,11 @@
+// Load and reuse MediaPipe pose detection with CPU fallback
 import {
   FilesetResolver,
   PoseLandmarker,
   type PoseLandmarkerOptions,
 } from "@mediapipe/tasks-vision";
 
+// Focus the remote runtime and lightweight model URL
 const MEDIAPIPE_VERSION = "1.0.0";
 const WASM_ROOT = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MEDIAPIPE_VERSION}/wasm`;
 const MODEL_URL =
@@ -25,11 +27,13 @@ export function loadPoseLandmarker(): Promise<PoseLandmarker> {
   return landmarkerPromise;
 }
 
+// Close the model and clear the cached reference
 export function closePoseLandmarker(landmarker: PoseLandmarker | null): void {
   landmarker?.close();
   landmarkerPromise = null;
 }
 
+// Create a GPU model first and fall back to CPU
 async function createPoseLandmarker(): Promise<PoseLandmarker> {
   const vision = await FilesetResolver.forVisionTasks(WASM_ROOT);
   const options: PoseLandmarkerOptions = {
@@ -45,6 +49,7 @@ async function createPoseLandmarker(): Promise<PoseLandmarker> {
     outputSegmentationMasks: false,
   };
 
+  // Keep model settings and switch delegate when GPU is unavailable
   try {
     return await PoseLandmarker.createFromOptions(vision, options);
   } catch {

@@ -1,17 +1,22 @@
+// Convert body-centre position into left, centre, or right
 import type { NormalizedLandmark } from "@mediapipe/tasks-vision";
 
+// efine the discrete directions consumed by games
 export type MovementState = "LEFT" | "CENTRE" | "RIGHT";
 
+// Set direction boundary & period for pose loss
 export const LEFT_MAX_X = 0.42;
 export const RIGHT_MIN_X = 0.58;
 export const POSE_LOSS_GRACE_MS = 600;
 
+// Identify min cofidence
 const MIN_LANDMARK_CONFIDENCE = 0.5;
 const LEFT_SHOULDER = 11;
 const RIGHT_SHOULDER = 12;
 const LEFT_HIP = 23;
 const RIGHT_HIP = 24;
 
+// Retain the last direction through tracking loss
 export class HorizontalMovementTracker {
   private currentState: MovementState | null = null;
   private lastPoseTimestamp = 0;
@@ -43,6 +48,7 @@ export class HorizontalMovementTracker {
   }
 }
 
+// Split the horizontal coordinate with two thresholds
 export function classifyHorizontalPosition(x: number): MovementState {
   if (x < LEFT_MAX_X) {
     return "LEFT";
@@ -73,6 +79,7 @@ function centreOfVisiblePair(
   return (first.x + second.x) / 2;
 }
 
+// Check whether landmark visibility is sufficient for control
 function isUsable(
   landmark: NormalizedLandmark | undefined,
 ): landmark is NormalizedLandmark {

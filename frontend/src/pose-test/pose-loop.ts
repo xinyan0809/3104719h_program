@@ -1,3 +1,4 @@
+// Run MediaPipe video detection
 import {
   type PoseLandmarker,
   type PoseLandmarkerResult,
@@ -6,6 +7,7 @@ import {
 type ResultHandler = (result: PoseLandmarkerResult) => void;
 type ErrorHandler = (error: Error) => void;
 
+// Ensure each new video frame is detected at most once
 export class PoseDetectionLoop {
   private animationFrameId: number | null = null;
   private lastVideoTime = -1;
@@ -26,6 +28,7 @@ export class PoseDetectionLoop {
     this.animationFrameId = requestAnimationFrame(this.detectFrame);
   }
 
+  // Cancel the frame and reset video timing
   stop(): void {
     if (this.animationFrameId !== null) {
       cancelAnimationFrame(this.animationFrameId);
@@ -34,6 +37,7 @@ export class PoseDetectionLoop {
     this.lastVideoTime = -1;
   }
 
+  // Detect a fresh video frame and keep the loop scheduled
   private readonly detectFrame = (): void => {
     if (this.animationFrameId === null) {
       return;

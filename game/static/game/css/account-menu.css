@@ -1,3 +1,4 @@
+/* Position the account entry in navigation */
 .account-menu-item {
   position: relative;
   margin-left: var(--space-3);
@@ -9,6 +10,7 @@
   position: relative;
 }
 
+/* Style the summary as a circular avatar button */
 .account-menu__trigger {
   width: 2.75rem;
   height: 2.75rem;
@@ -44,6 +46,7 @@
   line-height: 1;
 }
 
+/* Position the logout menu below the avatar */
 .account-menu__dropdown {
   width: 8.5rem;
   position: absolute;
@@ -68,6 +71,7 @@
   margin: 0;
 }
 
+/* Style logout as a full-row destructive action */
 .account-menu__logout {
   width: 100%;
   min-height: 2.5rem;

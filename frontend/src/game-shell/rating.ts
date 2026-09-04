@@ -1,3 +1,4 @@
+// Render stars and accessible text
 export function renderStarRating(
   element: HTMLElement,
   score: number,

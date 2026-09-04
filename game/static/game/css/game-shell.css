@@ -17,6 +17,7 @@
   place-items: center;
 }
 
+/* Pin Django notifications above the game layer */
 .page-game .message-list {
   position: fixed;
   z-index: 70;
@@ -36,6 +37,7 @@
   justify-content: center;
 }
 
+/* Establish the game stage with a dynamic video ratio */
 .game-shell__stage {
   --game-stage-aspect-ratio: 16 / 9;
   position: relative;
@@ -63,6 +65,7 @@
   transform: scaleX(-1);
 }
 
+/* Anchor score and time HUD in the top-right corner */
 .game-shell__hud {
   position: absolute;
   z-index: 12;
@@ -81,6 +84,7 @@
   pointer-events: none;
 }
 
+/* Style each value card inside the HUD */
 .game-shell__hud div {
   min-width: 4.5rem;
   border: 1px solid rgba(255, 255, 255, 0.22);
@@ -134,6 +138,7 @@
   display: none;
 }
 
+/* Cover intro and result views with a blurred overlay */
 .game-shell__intro,
 .game-shell__result {
   position: absolute;
@@ -196,6 +201,7 @@
   margin-top: 0;
 }
 
+/* Display camera or model errors prominently */
 .game-shell__error {
   margin-top: 0.55rem !important;
   color: #fecaca !important;
@@ -235,6 +241,7 @@
   content: "\2022";
 }
 
+/* Display a large countdown at stage center */
 .game-shell__countdown {
   position: absolute;
   z-index: 5;
@@ -265,6 +272,7 @@
     rgba(6, 12, 24, 0.74);
 }
 
+/* Enlarge and emphasize the final score */
 .game-shell__final-score {
   margin-top: 1rem !important;
   color: rgba(255, 255, 255, 0.72) !important;

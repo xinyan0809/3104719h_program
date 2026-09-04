@@ -5,6 +5,7 @@ export interface StagePoint {
   y: number;
 }
 
+// Match the stage aspect ratio to the camera video
 export function syncStageAspectRatio(
   stage: HTMLElement,
   video: HTMLVideoElement,

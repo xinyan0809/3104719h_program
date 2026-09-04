@@ -20,6 +20,7 @@
   overflow: hidden;
 }
 
+/* Enable absolute-position animation for baskets and fruit */
 .fruit-basket,
 .falling-fruit {
   position: absolute;

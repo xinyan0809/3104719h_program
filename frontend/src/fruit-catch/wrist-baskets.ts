@@ -1,3 +1,4 @@
+// Convert wrist landmarks into smoothly moving baskets
 import type { NormalizedLandmark } from "@mediapipe/tasks-vision";
 
 import {
@@ -15,6 +16,7 @@ import {
   WRIST_VISIBILITY_THRESHOLD,
 } from "./config";
 
+// Store MediaPipe left and right wrist indices
 const LEFT_WRIST = 15;
 const RIGHT_WRIST = 16;
 
@@ -25,6 +27,7 @@ export interface BasketCollisionBox {
   bottom: number;
 }
 
+// Pair a basket element with its last valid position
 interface BasketState {
   element: HTMLElement;
   position: StagePoint | null;
@@ -34,6 +37,7 @@ export class WristBasketController {
   private readonly left: BasketState;
   private readonly right: BasketState;
 
+  // Create independent state for baskets
   constructor(
     private readonly stage: HTMLElement,
     leftElement: HTMLElement,
@@ -51,6 +55,7 @@ export class WristBasketController {
     const stageWidth = this.stage.clientWidth;
     const stageHeight = this.stage.clientHeight;
 
+    // Hide baskets while the stage has no usable dimensions
     if (stageWidth <= 0 || stageHeight <= 0) {
       this.reset();
       return;
@@ -126,6 +131,7 @@ export class WristBasketController {
   }
 }
 
+// Require finite wrist coordinates and sufficient visibility
 function isReliableWrist(
   wrist: NormalizedLandmark | undefined,
 ): wrist is NormalizedLandmark {

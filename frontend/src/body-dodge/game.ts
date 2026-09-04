@@ -16,12 +16,14 @@ import {
   laneCentreX,
 } from "./lane-player";
 
+// Four state
 export type BodyDodgeGameState =
   | "IDLE"
   | "COUNTDOWN"
   | "PLAYING"
   | "FINISHED";
 
+  // Store one obstacle's position, lane, resolution state
 interface ObstacleEntity {
   element: HTMLElement;
   laneIndex: number;
@@ -41,6 +43,7 @@ interface BodyDodgeElements {
   finalScore: HTMLElement;
 }
 
+// Drive one round of the three-lane Body Dodge game
 export class BodyDodgeGame {
   private animationFrameId: number | null = null;
   private obstacles: ObstacleEntity[] = [];
@@ -75,6 +78,7 @@ export class BodyDodgeGame {
       return false;
     }
 
+    // Clear the previous round and initialize the new display
     this.stopLoop();
     this.clearObstacles();
     this.score = 0;
@@ -93,6 +97,7 @@ export class BodyDodgeGame {
     return true;
   }
 
+  // Cancel the current round and restore idle state
   cancel(): void {
     this.stopLoop();
     this.clearObstacles();
@@ -154,6 +159,7 @@ export class BodyDodgeGame {
     this.lastFrameAt = timestamp;
     this.spawnAccumulator += deltaMilliseconds;
 
+    // Spawn an obstacle when the interval and capacity allow it
     if (
       this.spawnAccumulator >= OBSTACLE_SPAWN_INTERVAL &&
       this.obstacles.length < MAX_ACTIVE_OBSTACLES
@@ -192,6 +198,7 @@ export class BodyDodgeGame {
     this.obstacles.push(obstacle);
   }
 
+  // Move obstacles and resolve dodge or collision at player height
   private moveAndResolveObstacles(deltaSeconds: number): void {
     const stageWidth = this.elements.stage.clientWidth;
     const stageHeight = this.elements.stage.clientHeight;
@@ -204,6 +211,7 @@ export class BodyDodgeGame {
       obstacle.y += OBSTACLE_FALL_SPEED * deltaSeconds;
       const obstacleBox = getObstacleBox(obstacle, stageWidth);
 
+      // Resolve an obstacle once when it reaches the player area
       if (
         !obstacle.resolved &&
         obstacleBox.bottom >= playerTop
@@ -240,6 +248,7 @@ export class BodyDodgeGame {
     obstacle?.element.remove();
   }
 
+  // Finish the round
   private finish(): void {
     this.stopLoop();
     this.clearObstacles();
@@ -272,6 +281,7 @@ export class BodyDodgeGame {
     return this.currentState === "COUNTDOWN" || this.currentState === "PLAYING";
   }
 
+  // Update game state, text, and controller
   private resetDisplay(): void {
     this.elements.score.textContent = "0";
     this.elements.time.textContent = String(Math.ceil(GAME_DURATION / 1_000));
@@ -292,6 +302,7 @@ export class BodyDodgeGame {
   }
 }
 
+// Calculate an obstacle collision box from lane and vertical centre
 function getObstacleBox(
   obstacle: ObstacleEntity,
   stageWidth: number,

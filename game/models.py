@@ -11,6 +11,7 @@ def avatar_upload_path(instance, filename):
     return f"profile_avatars/user_{instance.user_id}/{uuid4().hex}{suffix}"
 
 
+# Store one-to-one profile data
 class UserProfile(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -26,13 +27,14 @@ class UserProfile(models.Model):
     def __str__(self):
         return f"Profile for {self.user.get_username()}"
 
-
+# Store score and duration for each completed game
 class GameRecord(models.Model):
     class Game(models.TextChoices):
         FRUIT_CATCH = "fruit-catch", "Fruit Catch"
         TARGET_SHOT = "target-shot", "Target Shot"
         BODY_DODGE = "body-dodge", "Body Dodge"
 
+    # Link the user
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

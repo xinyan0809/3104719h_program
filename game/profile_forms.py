@@ -8,6 +8,7 @@ from .models import UserProfile
 MAX_AVATAR_SIZE = 5 * 1024 * 1024
 
 
+#Manage username and avatar updates while keeping email read-only
 class ProfileUpdateForm(forms.Form):
     username = forms.CharField(
         max_length=150,
@@ -38,6 +39,7 @@ class ProfileUpdateForm(forms.Form):
         ),
     )
 
+   # Populate initial values from the current user
     def __init__(self, *args, user, **kwargs):
         self.user = user
         initial = kwargs.setdefault("initial", {})
@@ -63,6 +65,7 @@ class ProfileUpdateForm(forms.Form):
             raise forms.ValidationError("The image must be 5 MB or smaller.")
         return avatar
 
+    # Save username and avatar, then remove the replaced file
     def save(self):
         self.user.username = self.cleaned_data["username"]
         self.user.save(update_fields=["username"])

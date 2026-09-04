@@ -16,6 +16,7 @@ from .models import GameRecord, UserProfile
 from .profile_forms import ProfileUpdateForm
 
 
+ # Set remember me
 class RememberMeLoginView(auth_views.LoginView):
     template_name = "registration/login.html"
     authentication_form = RememberMeAuthenticationForm
@@ -28,12 +29,12 @@ class RememberMeLoginView(auth_views.LoginView):
             self.request.session.set_expiry(0)
         return response
 
-
+# the authenticated home page
 @login_required
 def home(request):
     return render(request, "game/home.html")
 
-
+# CSRF Cookie_Fruit Catch
 @login_required
 @ensure_csrf_cookie
 def fruit_catch(request):
@@ -51,12 +52,12 @@ def target_shot(request):
 def body_dodge(request):
     return render(request, "game/body_dodge.html")
 
-
+# Show all available games
 @login_required
 def game_selection(request):
     return render(request, "game/game_selection.html")
 
-
+# Show or update the profile and summarize the user's scores
 @login_required
 def user_profile(request):
     profile = UserProfile.objects.filter(user=request.user).first()
@@ -105,7 +106,7 @@ def user_profile(request):
         },
     )
 
-
+# Validate and save one completed game record
 @login_required
 @require_POST
 def save_game_record(request):
@@ -144,11 +145,12 @@ def save_game_record(request):
     )
     return JsonResponse({"record_id": record.pk}, status=201)
 
-
+# Create an account and sign it in after registration
 def register(request):
+    # Skip registration for an already authenticated user
     if request.user.is_authenticated:
         return redirect("home")
-
+  # Process submitted data or prepare a blank form
     if request.method == "POST":
         form = RegistrationForm(request.POST)
         if form.is_valid():

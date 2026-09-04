@@ -1,14 +1,17 @@
+// Provide the shared score-saving client
 export type RecordableGame =
   | "fruit-catch"
   | "target-shot"
   | "body-dodge";
 
+// Describe one completed result that can be persisted
 interface CompletedGameRecord {
   gameId: RecordableGame;
   score: number;
   durationSeconds: number;
 }
 
+// Submit a final score using the page's CSRF information
 export async function saveCompletedGame(
   root: HTMLElement,
   record: CompletedGameRecord,
@@ -34,11 +37,13 @@ export async function saveCompletedGame(
     }),
   });
 
+  // Convert any unsuccessful response into a save failure
   if (!response.ok) {
     throw new Error("The game record could not be saved.");
   }
 }
 
+// Read one named value from the browser cookie string
 function readCookie(name: string): string | null {
   const prefix = name + "=";
   for (const item of document.cookie.split(";")) {

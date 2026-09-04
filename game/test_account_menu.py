@@ -1,8 +1,9 @@
+# Import the test user, client base, and URL reversing
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-
+# Verify account-menu markup and logout behavior
 class AccountMenuTests(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -11,6 +12,7 @@ class AccountMenuTests(TestCase):
             password="Testpass123",
         )
 
+    # Navigation should render exactly one account menu
     def test_authenticated_navigation_uses_one_account_menu(self):
         self.client.force_login(self.user)
 
@@ -21,6 +23,7 @@ class AccountMenuTests(TestCase):
         self.assertContains(response, "Log out", count=1)
         self.assertNotContains(response, "Signed in")
 
+    # Logging out from the menu should end the session
     def test_logout_from_account_menu_ends_session(self):
         self.client.force_login(self.user)
 

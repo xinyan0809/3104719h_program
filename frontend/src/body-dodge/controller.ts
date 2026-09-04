@@ -1,3 +1,4 @@
+// Connect the DOM, tracking and state
 import { renderStarRating } from "../game-shell/rating";
 import { saveCompletedGame } from "../game-shell/records";
 import { PoseGameSession } from "../game-shell/pose-session";
@@ -6,6 +7,7 @@ import { GAME_DURATION } from "./config";
 import { BodyDodgeGame, type BodyDodgeGameState } from "./game";
 import { LanePlayerController } from "./lane-player";
 
+// list all the elements
 interface BodyDodgeElements {
   root: HTMLElement;
   stage: HTMLElement;
@@ -28,6 +30,7 @@ interface BodyDodgeElements {
   rating: HTMLElement;
 }
 
+// Initialize page interaction
 export function mountBodyDodge(): void {
   const elements = getElements();
   if (!elements) {
@@ -62,6 +65,8 @@ export function mountBodyDodge(): void {
       player.syncStageToVideo(elements.video);
       updateControls();
     },
+
+    // Calculate horizontal position and update the player each frame
     onResult: (result) => {
       const landmarks = result.landmarks[0];
       const movement = movementTracker.update(
@@ -93,6 +98,7 @@ export function mountBodyDodge(): void {
 
   const isGameReady = (): boolean => poseSession.isReady;
 
+  // Refresh controls and results from pose and game state
   const updateControls = (stateChange?: BodyDodgeGameState): void => {
     const state = game?.state ?? "IDLE";
     if (stateChange === "FINISHED") {
@@ -180,6 +186,7 @@ export function mountBodyDodge(): void {
     updateControls();
   };
 
+  // Start camera, model, and gameplay from one user action
   const startCameraAndGame = async (): Promise<void> => {
     if (poseSession.isStarting || poseSession.isRunning) {
       return;

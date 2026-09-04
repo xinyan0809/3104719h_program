@@ -1,3 +1,4 @@
+// Wrap browser camera access with readable errors
 export class CameraAccessError extends Error {
   constructor(message: string, options?: ErrorOptions) {
     super(message, options);
@@ -5,14 +6,17 @@ export class CameraAccessError extends Error {
   }
 }
 
+// Manage one cancellable camera media stream
 export class CameraController {
   private stream: MediaStream | null = null;
   private requestVersion = 0;
 
+  // whether an active media stream exists
   get isRunning(): boolean {
     return this.stream !== null;
   }
 
+  // Request the front camera and play it in the video element
   async start(video: HTMLVideoElement): Promise<void> {
     if (this.stream) {
       return;
@@ -36,6 +40,7 @@ export class CameraController {
         },
       });
 
+      // Release a late stream if the request was stopped while pending
       if (requestVersion !== this.requestVersion) {
         stream.getTracks().forEach((track) => track.stop());
         return;
@@ -50,6 +55,7 @@ export class CameraController {
     }
   }
 
+  // Stop every track and clear the video element
   stop(video: HTMLVideoElement): void {
     this.requestVersion += 1;
     this.stream?.getTracks().forEach((track) => track.stop());
@@ -61,11 +67,13 @@ export class CameraController {
   }
 }
 
+// give user messages
 function cameraErrorMessage(error: unknown): string {
   if (!(error instanceof DOMException)) {
     return "The camera could not be started. Check the browser camera settings.";
   }
 
+  // Return specific guidance for errors
   switch (error.name) {
     case "NotAllowedError":
     case "SecurityError":

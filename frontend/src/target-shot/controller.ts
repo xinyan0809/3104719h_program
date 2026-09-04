@@ -32,6 +32,7 @@ export function mountTargetShot(): void {
     return;
   }
 
+  // Create the right-hand gun and reserve the game instance
   const gun = new RightHandGunController(elements.stage, elements.gun);
   let game: TargetShotGame;
 
@@ -167,6 +168,8 @@ export function mountTargetShot(): void {
       updateControls();
       return;
     }
+
+    // Reset gun position history before every round
     gun.reset();
     game.start();
     updateControls();

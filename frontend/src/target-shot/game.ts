@@ -17,6 +17,7 @@ import {
 import type { StagePoint } from "../game-shell/coordinates";
 import type { RightHandGunController } from "./hand-gun";
 
+// Four state
 export type TargetShotGameState =
   | "IDLE"
   | "COUNTDOWN"
@@ -113,6 +114,7 @@ export class TargetShotGame {
     this.setState("IDLE", "Idle");
   }
 
+  // Cancel accumulated aim time when tracking is lost
   handleTrackingLoss(): void {
     this.cancelDwell();
   }
@@ -131,6 +133,7 @@ export class TargetShotGame {
     }
   };
 
+  // Update countdown and transition into gameplay
   private updateCountdown(timestamp: number): void {
     const elapsed = timestamp - this.stateStartedAt;
     if (elapsed >= COUNTDOWN_DURATION) {
@@ -167,6 +170,7 @@ export class TargetShotGame {
 
     this.updateTargetLifecycles(timestamp);
 
+    // Spawn a target when the interval and capacity allow it
     if (
       this.spawnAccumulator >= TARGET_SPAWN_INTERVAL &&
       this.targets.length < MAX_ACTIVE_TARGETS
@@ -178,6 +182,7 @@ export class TargetShotGame {
     this.updateDwell(timestamp, deltaMilliseconds);
   }
 
+  // Spawn a target in bounds and away from the current gun point
   private spawnTarget(timestamp: number): void {
     const stageWidth = this.elements.stage.clientWidth;
     const stageHeight = this.elements.stage.clientHeight;
@@ -243,6 +248,7 @@ export class TargetShotGame {
     this.nextTargetId += 1;
   }
 
+  // Advance hit animation and remove expired targets
   private updateTargetLifecycles(timestamp: number): void {
     for (let index = this.targets.length - 1; index >= 0; index -= 1) {
       const target = this.targets[index];
@@ -265,6 +271,7 @@ export class TargetShotGame {
     }
   }
 
+  // Accumulate dwell time and register a hit at the threshold
   private updateDwell(timestamp: number, deltaMilliseconds: number): void {
     const gunPoint = this.gun.getHitPoint();
     if (!gunPoint) {
@@ -319,6 +326,7 @@ export class TargetShotGame {
     return closest;
   }
 
+  // Lock one hit, reset dwell, and add the target's score
   private hitTarget(target: TargetEntity, timestamp: number): void {
     if (target.state === "HIT_ANIMATING") {
       return;
@@ -337,9 +345,12 @@ export class TargetShotGame {
     this.elements.score.textContent = String(this.score);
   }
 
+  // Replace a hit target face with four falling fragments
   private breakTarget(target: TargetEntity): void {
     target.broken = true;
     target.element.classList.add("is-broken");
+
+    // Create fragments matching the CSS quadrant variants
     for (let index = 1; index <= 4; index += 1) {
       const fragment = document.createElement("span");
       fragment.className = `target-shot__fragment target-shot__fragment--${index}`;
@@ -347,6 +358,7 @@ export class TargetShotGame {
     }
   }
 
+  // Restore the aimed target and clear dwell progress
   private cancelDwell(): void {
     if (this.dwellTargetId !== null) {
       const target = this.targets.find(

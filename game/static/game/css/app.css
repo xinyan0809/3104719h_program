@@ -1,3 +1,4 @@
+/* Define site-wide color, type, spacing, radius, and shadow tokens */
 :root {
   --color-background: #f3f6fa;
   --color-surface: #ffffff;
@@ -73,6 +74,7 @@ html {
   background: var(--color-background);
 }
 
+/* Establish global typography, background, and vertical page structure */
 body {
   min-width: 20rem;
   min-height: 100vh;
@@ -215,7 +217,7 @@ canvas {
   color: var(--color-muted);
   font-size: var(--font-size-lg);
 }
-
+/* Establish the shared pill-badge appearance(not used now, for future) */
 .badge {
   width: fit-content;
   min-height: 1.75rem;

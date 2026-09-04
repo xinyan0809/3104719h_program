@@ -1,3 +1,4 @@
+
 import { renderStarRating } from "../game-shell/rating";
 import { saveCompletedGame } from "../game-shell/records";
 import { PoseGameSession } from "../game-shell/pose-session";
@@ -6,6 +7,7 @@ import { GAME_DURATION } from "./config";
 import { EasyFruitCatchGame, type GameState } from "./game";
 import { WristBasketController } from "./wrist-baskets";
 
+// List all elements
 interface FruitCatchElements {
   root: HTMLElement;
   stage: HTMLElement;
@@ -29,12 +31,14 @@ interface FruitCatchElements {
   rating: HTMLElement;
 }
 
+// Initialize page interactions and bind the game lifecycle
 export function mountFruitCatch(): void {
   const elements = getElements();
   if (!elements) {
     return;
   }
 
+  // Create the pose renderer and dual-wrist basket controller
   const renderer = new PoseRenderer(elements.canvas);
   const baskets = new WristBasketController(
     elements.stage,
@@ -44,6 +48,7 @@ export function mountFruitCatch(): void {
 
   let game: EasyFruitCatchGame;
 
+  // Sync camera status text and styling state
   const setPoseStatus = (message: string, state: string): void => {
     elements.poseStatus.textContent = message;
     elements.poseStatus.dataset.status = state;
@@ -133,6 +138,7 @@ export function mountFruitCatch(): void {
     }
   };
 
+  // Create the game instance and route state changes back here
   game = new EasyFruitCatchGame(
     {
       stage: elements.stage,
@@ -172,7 +178,9 @@ export function mountFruitCatch(): void {
     updateControls();
   };
 
+  // Start camera, model, and gameplay from one user action
   const startCameraAndGame = async (): Promise<void> => {
+    // Prevent concurrent startup or duplicate camera access
     if (poseSession.isStarting || poseSession.isRunning) {
       return;
     }
@@ -213,6 +221,7 @@ export function mountFruitCatch(): void {
   updateControls();
 }
 
+// Find and validate elements required by the Fruit Catch template
 function getElements(): FruitCatchElements | null {
   const root = document.querySelector<HTMLElement>("#fruit-catch-root");
   if (!root) {

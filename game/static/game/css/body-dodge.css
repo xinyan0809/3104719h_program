@@ -1,3 +1,4 @@
+/* Color side and centre movement states differently */
 #dodge-movement-state[data-movement="left"],
 #dodge-movement-state[data-movement="right"] {
   color: var(--color-info);
@@ -26,6 +27,7 @@
   pointer-events: none;
 }
 
+/* Style lane names for readability */
 .body-dodge__lanes span {
   padding-top: var(--space-3);
   color: rgba(255, 255, 255, 0.72);

@@ -17,6 +17,7 @@ const RIGHT_WRIST = 16;
 const RIGHT_PINKY = 18;
 const RIGHT_INDEX = 20;
 
+// Manage right-hand gun position and visibility
 export class RightHandGunController {
   private position: StagePoint | null = null;
 
@@ -44,11 +45,13 @@ export class RightHandGunController {
       .map((index) => landmarks[index])
       .filter(isReliableHandLandmark);
 
+      // Stop aiming when every hand landmark is unreliable
     if (reliableLandmarks.length === 0) {
       this.reset();
       return false;
     }
 
+    // Average usable landmarks for a steadier hand centre
     const averagedLandmark = reliableLandmarks.reduce(
       (average, landmark) => ({
         ...average,

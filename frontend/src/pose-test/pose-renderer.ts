@@ -18,6 +18,7 @@ export class PoseRenderer {
     this.drawingUtils = new DrawingUtils(context);
   }
 
+  // Draw the first pose and report whether a person was detected
   draw(result: PoseLandmarkerResult, video: HTMLVideoElement): boolean {
     this.resizeToVideo(video);
     this.clear();
@@ -47,6 +48,7 @@ export class PoseRenderer {
     }
   }
 
+  // Draw pose connectors and landmarks
   private drawPose(landmarks: NormalizedLandmark[]): void {
     this.drawingUtils.drawConnectors(
       landmarks,

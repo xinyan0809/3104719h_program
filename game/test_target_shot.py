@@ -18,6 +18,7 @@ class TargetShotAccessTests(TestCase):
         expected_login_url = f"{reverse('login')}?next={reverse('target_shot')}"
         self.assertRedirects(response, expected_login_url)
 
+    # Authenticated users should reach the game root
     def test_authenticated_user_can_access_target_shot(self):
         self.client.force_login(self.user)
 
@@ -33,6 +34,7 @@ class TargetShotAccessTests(TestCase):
 
         self.assertTemplateUsed(response, "game/target_shot.html")
 
+    # The game library should link to Target Shot
     def test_game_selection_links_to_target_shot(self):
         self.client.force_login(self.user)
 

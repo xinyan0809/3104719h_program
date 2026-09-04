@@ -19,12 +19,14 @@ class ProfilePageTests(TestCase):
             password="Testpass123",
         )
 
+    # Anonymous users should be required to log in
     def test_anonymous_user_is_redirected_to_login(self):
         response = self.client.get(reverse("user_profile"))
 
         expected_url = f"{reverse('login')}?next={reverse('user_profile')}"
         self.assertRedirects(response, expected_url)
 
+    # Signed-in users should see their own profile
     def test_authenticated_user_can_access_profile(self):
         self.client.force_login(self.user)
 
@@ -44,6 +46,7 @@ class ProfilePageTests(TestCase):
 
         self.assertContains(response, "Not provided")
 
+    # Email should remain disabled in edit mode
     def test_edit_mode_keeps_email_disabled(self):
         self.client.force_login(self.user)
 
@@ -83,6 +86,7 @@ class ProfilePageTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "This username is already in use.")
 
+    # A valid avatar should be saved under the media root
     def test_valid_avatar_is_saved(self):
         self.client.force_login(self.user)
         avatar = make_test_avatar()

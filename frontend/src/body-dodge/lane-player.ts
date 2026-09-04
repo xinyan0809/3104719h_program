@@ -1,3 +1,5 @@
+
+// Map body direction to lane position and collision bounds
 import type { MovementState } from "../pose-test/movement";
 import { syncStageAspectRatio } from "../game-shell/coordinates";
 import {
@@ -19,10 +21,13 @@ export interface CollisionBox {
   bottom: number;
 }
 
+// Manage player lane, tracking state, and screen position
 export class LanePlayerController {
   private lane: MovementState = "CENTRE";
   private trackingAvailable = false;
 
+
+  // Initialize player size and render the default centre lane
   constructor(
     private readonly stage: HTMLElement,
     private readonly element: HTMLElement,
@@ -37,6 +42,7 @@ export class LanePlayerController {
     syncStageAspectRatio(this.stage, video);
   }
 
+  // Update the tracked lane while retaining display position on loss
   update(movement: MovementState | null): void {
     if (movement) {
       this.lane = movement;
@@ -81,11 +87,13 @@ export class LanePlayerController {
     this.element.dataset.lane = this.lane.toLowerCase();
   }
 
+  // Sync tracking state to a DOM data attribute
   private renderTrackingState(): void {
     this.element.dataset.tracking = String(this.trackingAvailable);
   }
 }
 
+// Calculate the horizontal pixel centre of a lane
 export function laneCentreX(laneIndex: number, stageWidth: number): number {
   return ((laneIndex + 0.5) / LANE_COUNT) * stageWidth;
 }

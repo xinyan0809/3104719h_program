@@ -1,3 +1,4 @@
+// Centralize Target Shot timing, scoring, sizing, and animation settings
 export const GAME_DURATION = 60_000;
 export const COUNTDOWN_DURATION = 3_000;
 export const TARGET_SPAWN_INTERVAL = 1_600;

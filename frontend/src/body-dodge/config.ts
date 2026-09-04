@@ -1,3 +1,5 @@
+// Centralize Body Dodge timing, speed, size, and lane settings
+
 export const GAME_DURATION = 60_000;
 export const COUNTDOWN_DURATION = 3_000;
 export const OBSTACLE_SPAWN_INTERVAL = 1_750;
@@ -8,6 +10,7 @@ export const OBSTACLE_SIZE = 58;
 export const PLAYER_BOTTOM_OFFSET = 22;
 export const LANE_COUNT = 3;
 
+// random icons
 export const OBSTACLE_EMOJIS = [
   "\u{1F6A7}",
   "\u{1FAA8}",

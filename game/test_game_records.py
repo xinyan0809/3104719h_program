@@ -6,7 +6,7 @@ from django.urls import reverse
 
 from .models import GameRecord
 
-
+# Verify the score API and profile record summaries
 class GameRecordTests(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -19,6 +19,7 @@ class GameRecordTests(TestCase):
             password="Testpass123",
         )
 
+    # Anonymous score submission should redirect to login
     def test_anonymous_record_request_is_redirected_to_login(self):
         response = self.client.post(
             reverse("save_game_record"),
@@ -37,6 +38,7 @@ class GameRecordTests(TestCase):
         )
         self.assertRedirects(response, expected_url)
 
+    # A signed-in user with valid CSRF can save a score
     def test_authenticated_user_can_save_completed_game(self):
         csrf_client = Client(enforce_csrf_checks=True)
         csrf_client.force_login(self.user)
@@ -81,6 +83,7 @@ class GameRecordTests(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertFalse(GameRecord.objects.exists())
 
+    # The profile should isolate the user and show their best score
     def test_profile_shows_only_current_users_records_and_best_score(self):
         GameRecord.objects.create(
             user=self.user,

@@ -1,3 +1,4 @@
+// Coordinate camera, pose model, and frame detection lifecycles
 import type {
   PoseLandmarker,
   PoseLandmarkerResult,
@@ -10,6 +11,7 @@ import {
 } from "../pose-test/pose-landmarker";
 import { PoseDetectionLoop } from "../pose-test/pose-loop";
 
+// Define callbacks: game received the pose position
 interface PoseSessionOptions {
   video: HTMLVideoElement;
   onVideoReady: () => void;
@@ -18,7 +20,9 @@ interface PoseSessionOptions {
   onRuntimeError: (error: Error) => void;
 }
 
+// Encapsulate the pose session that can safely start, stop, dispose
 export class PoseGameSession {
+  // Track
   private readonly camera = new CameraController();
   private landmarker: PoseLandmarker | null = null;
   private detectionLoop: PoseDetectionLoop | null = null;
@@ -28,18 +32,19 @@ export class PoseGameSession {
 
   constructor(private readonly options: PoseSessionOptions) {}
 
+  // make sure these are ready
   get isStarting(): boolean {
     return this.starting;
   }
-
   get isRunning(): boolean {
     return this.camera.isRunning;
   }
-
+  // only when both model and camera are ready, game can start
   get isReady(): boolean {
     return this.modelReady && this.camera.isRunning;
   }
 
+  // Start camera, load the model, then begin detection
   async start(): Promise<boolean> {
     if (this.starting || this.camera.isRunning) {
       return false;
@@ -86,6 +91,7 @@ export class PoseGameSession {
     }
   }
 
+  // Stop detection and camera, then notify the game to reset
   stop(): void {
     this.operationVersion += 1;
     this.starting = false;
@@ -96,12 +102,14 @@ export class PoseGameSession {
     this.options.onReset();
   }
 
+  // Fully release the session and model resources
   dispose(): void {
     this.stop();
     closePoseLandmarker(this.landmarker);
     this.landmarker = null;
   }
 
+  // check action: whether an async result still belongs to the active
   private isCurrentRunningOperation(operation: number): boolean {
     return operation === this.operationVersion && this.camera.isRunning;
   }

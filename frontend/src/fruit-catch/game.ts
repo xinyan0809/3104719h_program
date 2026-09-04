@@ -1,3 +1,4 @@
+
 import {
   COUNTDOWN_DURATION,
   FRUIT_EMOJIS,
@@ -12,6 +13,7 @@ import type {
   WristBasketController,
 } from "./wrist-baskets";
 
+// Four state
 export type GameState = "IDLE" | "COUNTDOWN" | "PLAYING" | "FINISHED";
 
 interface FruitEntity {
@@ -21,6 +23,7 @@ interface FruitEntity {
   caught: boolean;
 }
 
+// Collect page elements updated by game logic
 interface GameElements {
   stage: HTMLElement;
   fruitLayer: HTMLElement;
@@ -32,6 +35,8 @@ interface GameElements {
   finalScore: HTMLElement;
 }
 
+
+// Drive one round of the Fruit Catch game
 export class EasyFruitCatchGame {
   private animationFrameId: number | null = null;
   private fruits: FruitEntity[] = [];
@@ -124,6 +129,7 @@ export class EasyFruitCatchGame {
     this.elements.countdown.textContent = String(remaining);
   }
 
+  // Update time, spawn fruit, and advance active fruit
   private updatePlaying(timestamp: number): void {
     const elapsed = timestamp - this.playingStartedAt;
     const remaining = Math.max(0, GAME_DURATION - elapsed);
@@ -139,6 +145,7 @@ export class EasyFruitCatchGame {
     this.lastFrameAt = timestamp;
     this.spawnAccumulator += deltaMilliseconds;
 
+    // Spawn fruit when the interval is met and capacity is available
     if (
       this.spawnAccumulator >= FRUIT_SPAWN_INTERVAL &&
       this.fruits.length < MAX_ACTIVE_FRUITS
@@ -175,6 +182,7 @@ export class EasyFruitCatchGame {
     this.fruits.push(fruit);
   }
 
+  // Move fruit and resolve caught or missed outcomes
   private moveAndResolveFruit(deltaSeconds: number): void {
     const stageWidth = this.elements.stage.clientWidth;
     const stageHeight = this.elements.stage.clientHeight;
@@ -257,6 +265,7 @@ export class EasyFruitCatchGame {
   }
 }
 
+// Test whether a fruit rectangle overlaps a basket rectangle
 function overlaps(fruit: FruitEntity, basket: BasketCollisionBox): boolean {
   return (
     fruit.x < basket.right &&
